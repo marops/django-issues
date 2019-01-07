@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% load issues_tags %}
+{% block content %}
+
+<style>
+    .card {
+        margin-bottom: 1rem;
+    }
+
+    .card-body {
+        display: none;
+    }
+
+    .response-number {}
+</style>
+
+<div style="margin: 0 0 ; font-size:11pt">
+    <h3>Issue Number {{object.pk}} <a href="{% url 'issues:issues-action' object.pk 'edit' %}"><button type="button" class="btn btn-sm" >Edit</button></a> </h3>
+
+    <b>Short Desc</b>: {{ object.short_desc }}
+    <br/>
+    <b>Created</b>: {{object.created_date | date:"Y-m-d H:i:s e"}}
+    <b>Due</b>: {{object.due_date | date:"Y-m-d"}}
+    <b>Completed</b>: {{object.completed_date | date:"Y-m-d H:i:s e"}}
+    <br/>
+    <b>Submitted by</b>: {{object.submitted_by}}<span style="width:2em">&nbsp</span>
+    <b>Assigned to</b>: {{object.assigned_to}}
+    <br/>
+
+    <b>Desc</b>:
+    <br/>
+    <div style="margin-left:1em">
+        {{ object.desc | linebreaks }}
+    </div>
+
+    <hr/>
+    <h4>Responses</h4>
+    <!-- Responses -->
+    {% for r in issue_responses %}
+    <div class="card">
+        <div class="card-header" onclick="$(this).next().toggle()">
+            ( {{r.id}} ) &nbsp;&nbsp;
+            <b>Date:</b> {{r.date}}&nbsp;&nbsp;
+            <b>From:</b> {{r.author}}&nbsp;
+            <b>Text:</b> {{r.text|truncatechars:55}}
+        </div>
+        <div class="card-body">
+            {{r.text|linebreaks}}
+            <hr/>
+            <b><u>Attachments:</u></b>
+            {% issues_response_files r %}
+        </div>
+
+    </div>
+    {% endfor %}
+
+    <div id="id_response_form" style="display:none")>
+        <h3>Enter a New Response:</h3>
+       <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ response_form|crispy }}
+
+
+      <div class="form-group">
+        <label for="file">Attachments</label>
+        <input type="file" class="form-control-file" id="file" name="file" multiple>
+      </div>
+
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </form>
+
+    </div>
+
+    <div>
+
+    <p><button type="button" id="btn" class="btn btn-primary"  onclick="new_response_form();">New Response</button></p>
+
+
+        <hr>
+        <p style="font-size:0.8rem">Last Modified {{object.modified_date | date:"Y-m-d H:i:s e"}}</p>
+    </div>
+</div>
+
+<script>
+    function new_response_form(){
+        $("#id_response_form").toggle()
+        $("#btn").hide()
+    }
+
+</script>
+
+{% endblock %}

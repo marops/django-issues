@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load tz %}
+{% block content %}
+
+<style>
+    .table {font-size:11pt; }
+</style>
+
+<h1>Issues</h1>
+{% get_current_timezone as TIME_ZONE %}
+
+<hr>
+<style>
+    table {font-size:1rem;}
+</style>
+<table class="table table-sm table-striped table-bordered">
+    <thead>
+        <th>Issue#</th><th>Title</th><th>Created</th><th>Due</th><th>Completed</th><th>Submitted By</th><th>Assigned To</th>
+    </thead>
+    <tbody>
+{% for p in issues %}
+    <tr>
+        <td><a href="/issues/{{p.pk}}/">{{ p.pk }}</a></td>
+        <td><a href="/issues/{{p.pk}}/edit">{{ p }}</a></td>
+        <td>{{ p.created_date|date:"Y-m-d H:i:s e" }}</td>
+        <td>{{ p.due_date|date:"Y-m-d" }}</td>
+        <td>{{ p.completed_date|date:"Y-m-d H:i:s e" }}</td>
+        <td>{{ p.submitted_by}}</td>
+        <td>{{ p.assigned_to}}</td>
+    </tr>
+{% empty %}
+    <li>No issues yet.</li>
+{% endfor %}
+    </tbody>
+</table>
+
+<div>
+    <a href="/issues/0/edit"/" class="btn btn-primary" role="button">Submit New Issue</a>
+</div>
+
+{% endblock %}

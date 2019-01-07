@@ -1,0 +1,19 @@
+Todo:
+
+* When prepending issue_id to save directory, remove directory when no more files in it
+* Issue Detail, showing individual Resposne, remove (id) and replace expand/collapse icon
+* Display users lastname, firstname on form, detailview, listview
+* Add category column to Issues List View
+
+COMPLETED
+X When Document is deleted, delete the document on the disk
+X Add issue_id to saved document output. Ex. output+to= "docs". Add MEDIA_ROOT/docs/<issue_id>/<filename>
+* Issue Detail View, Response header, add HTML output for the brief display of the response text.
+* template menu when logged out
+* Add engineer account for test login
+
+
+Tests
+======
+
+1. Submit New Issue

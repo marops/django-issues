@@ -1,0 +1,18 @@
+<ul>
+{% for r in issue_responses %}
+    <div class="card">
+      <div class="card-header" onclick="$(this).next().toggle()">
+          ( {{r.id}} ) &nbsp;&nbsp;
+          {{r.snippet}}
+          <b>Date:</b> {{r.date}}&nbsp;&nbsp;
+          <b>From:</b> {{r.author}}
+      </div>
+      <div class="card-body">
+          {{r.body|linebreaks}}
+          <hr/>
+          <b><u>Attachments:</u></b>
+      </div>
+
+    </div>
+{% endfor %}
+</ul>

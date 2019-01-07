@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block content %}
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.16/css/dataTables.bootstrap4.min.css">
+
+<script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap4.min.js"></script>
+
+<style>
+    table {font-size:.9em;max-width:1000px;}
+</style>
+
+<h2>{{title}}</h2>
+
+<div style="padding:1em">
+    <a href="/issues/0/new" class="btn btn-primary" role="button">New Issue</a>
+    <a href="/issues/list/?f=mine" class="btn btn-secondary " role="button">My Open Issues</a>
+    <a href="/issues/list/?f=ua" class="btn btn-secondary " role="button">Unassigned Issues</a>
+    <a href="/issues/list" class="btn btn-secondary " role="button">Open Issues</a>
+</div>
+<div style="max-width:1200px;margin:auto auto">
+<table id="example" class="table table-striped table-bordered table-sm" style="width:100%;marginauto auto">
+        <thead class="thead-light">
+            <tr>
+                {% for i in headers %}
+                    <th>{{i}}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+
+</table>
+
+</div>
+
+<script>
+        $('#example').DataTable({
+            "ajax": "{% url 'issues:list-data' %}{{ajax_url}}",
+            "data": {
+                "submitted_by": 1
+            },
+            "columnDefs": [
+                {
+                    "render": function ( data, type, row ) {
+                        return '<a href="/issues/'+row[0]+'">'+data +'</a>';
+                    },
+                   "targets": 1
+                },
+                {
+                    "render": function ( data, type, row ) {
+                        return '<a href="/issues/'+row[0]+'">'+data +'</a>';
+                    },
+                   "targets": 0
+                },
+                {
+                    "render": function ( data, type, row ) {
+                        return data.substring(0,10);
+                    },
+                   "targets": 3
+                }
+            ],
+            "paging": true,
+            "processing": true,
+            "serverSide": true
+        })
+</script>
+{% endblock %}

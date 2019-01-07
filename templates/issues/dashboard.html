@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+    .table {max-width:600px; margin: 2em auto }
+</style>
+<h2>Issues Dashboard</h2>
+<table class="table table-striped table-bordered">
+     <thead>
+      <tr>
+        <th>List View</th>
+        <th>Total</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><a href="{% url 'issues:list' %}?f=mine">My Open Issues</a></td>
+            <td>{{my_open_issues}}</td>
+        </tr>
+        <tr>
+            <td><a href="{% url 'issues:list' %}">Open Issues</a></td>
+            <td>{{open_issues}}</td>
+        </tr>
+         <tr>
+            <td><a href="{% url 'issues:list' %}?f=ua">Unassigned Issues</a></td>
+             <td>{{unassigned_open_issues}}</td>
+        </tr>
+
+    </tbody>
+</table>
+</script>
+{% endblock %}
