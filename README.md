@@ -3,7 +3,7 @@
 A Issue/Incident tracking Django App. It also has modules to support Django CMS integration.
 
 1. Create a New Issue
-+++++++++++++++++++++
+=====================
 
 
 * Select ` *Issue Tracker | New Issue*  from Menu
@@ -15,7 +15,7 @@ A Issue/Incident tracking Django App. It also has modules to support Django CMS 
 
 
 2. View a List of Isues
-+++++++++++++++++++++++
+===============================================
 
 
 * List of Issues. Will have the ability to filter on
@@ -33,8 +33,7 @@ A Issue/Incident tracking Django App. It also has modules to support Django CMS 
 * Select the issue to view. This will open an Issue detail view and list all responses to the issue.
 
 3. View the Details of an Issue and Be Able to View and Submit Responses
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
+========================================================================
 
 * This will open an Issue detail view and list all responses to the issue.
 * Click on the Reponse headers to expand it for details. Attachments submitted as part of a response will be listed.
@@ -47,8 +46,7 @@ A Issue/Incident tracking Django App. It also has modules to support Django CMS 
 * When resolved, enter resolution and mark issue completed.
 
 4. View a Dashboard
-+++++++++++++++++++
-
+===================
 
 *  `A summary of Issues </issues/dashboard>`_ 
 * Others TBD.
