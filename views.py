@@ -6,18 +6,19 @@ from django.utils import timezone
 from .forms import IssueForm, ResponseForm
 from django.core.files.storage import default_storage
 from os import path
-from django.contrib.auth.models import User, Group
-from django.views.generic.base import TemplateView
 from django.db.models import Count
 from django.urls import reverse
+from django.contrib.auth.decorators import login_required
 
-
+@login_required
 def index(request):
     return render(request,'issues/index.html')
 
+@login_required
 def test(request):
     return render(request,'issues/test.html')
 
+@login_required
 def dashboard(request):
     sql="select i.id, i.category_id,c.name,count(*) from issues_issue i left join issues_category c on i.category_id=c.id where not i.completed group by c.name"
 
@@ -28,6 +29,7 @@ def dashboard(request):
 
     return render(request, 'issues/dashboard.html', {'my_open_issues':my_open_issues,'open_issues':open_issues,'unassigned_open_issues':unassigned_open_issues})
 
+@login_required
 def issues_list(request):
     title="Open Issues"
     f=request.GET.get('f',None)
@@ -99,7 +101,7 @@ class DTIssueListViewData(BaseDatatableView):
 #     headers=['Issue#','Short_Desc','Category','Created','Submitted By','Assigned To','Completed']
 #     extra_context={'headers': headers,'ajax_url':'/issues/list3/data'}
 
-
+@login_required
 def issue_view(request,pk,action=None):
     """
 
@@ -146,6 +148,7 @@ def issue_view(request,pk,action=None):
 
     return render(request, 'issues/issue.html', {'form': form, 'rid':pk})
 
+@login_required
 def issue_detail(request, pk):
 
     if request.method == 'POST':
@@ -177,18 +180,18 @@ def issue_detail(request, pk):
 
 
 #Other list possibilities - not currently used
-def rest(request):
-    # View code here...
-    return render(request, 'issues/list2.html', {})
-
-from .tables import IssueTable
-from django_tables2 import RequestConfig
-
-def list3(request):
-    table = IssueTable(Issue.objects.all())
-    RequestConfig(request).configure(table)
-    return render(request, 'issues/list3.html', {'table': table})
-    #return render(request, 'issues/list3.html',  {'issues': Issue.objects.all()})
+# def rest(request):
+#     # View code here...
+#     return render(request, 'issues/list2.html', {})
+#
+# from .tables import IssueTable
+# from django_tables2 import RequestConfig
+#
+# def list3(request):
+#     table = IssueTable(Issue.objects.all())
+#     RequestConfig(request).configure(table)
+#     return render(request, 'issues/list3.html', {'table': table})
+#     #return render(request, 'issues/list3.html',  {'issues': Issue.objects.all()})
 
 # class IssuesListView(ListView):
 #
@@ -199,16 +202,16 @@ def list3(request):
 #     #paginate_by=10
 
 
-class IssueDetailView(DetailView):
-
-    model = Issue
-    template_name = 'issues/detail.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['now'] = timezone.now()
-        return context
-
+# class IssueDetailView(DetailView):
+#
+#     model = Issue
+#     template_name = 'issues/detail.html'
+#
+#     def get_context_data(self, **kwargs):
+#         context = super().get_context_data(**kwargs)
+#         context['now'] = timezone.now()
+#         return context
+#
 
 # from rest_framework import viewsets
 # from .serializers import  IssueSerializer, ResponseSerializer, UserSerializer, GroupSerializer

@@ -5,6 +5,7 @@ from django.contrib import admin
 from django.contrib.sitemaps.views import sitemap
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.views.static import serve
+from django.contrib.auth.decorators import login_required
 
 #from django.urls import path, include
 
@@ -34,7 +35,7 @@ urlpatterns = [
     url(r'^$',  views.dashboard, name='index'),
     url(r'^list/$', views.issues_list, name='list'),
     url(r'^dashboard/$',  views.dashboard, name='dashboard'),
-    url(r'^list/data/', views.DTIssueListViewData.as_view(), name='list-data'),
+    url(r'^list/data/', login_required(views.DTIssueListViewData.as_view()), name='list-data'),
     url(r'(?P<pk>\d+)/(?P<action>\w+)/$', views.issue_view, name='issues-action'),
     url(r'(?P<pk>\d+)/$', views.issue_detail, name='issues-detail'),
     # url(r'^list/data/', views.DTIssueListViewData.as_view(), name='issues-list-data'),
