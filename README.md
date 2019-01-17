@@ -1,4 +1,4 @@
-Django Issue Tracking App
+Django Issue Tracking App 1
 
 A Issue/Incident tracking Django App. It also has modules to support Django CMS integration.It can:
 
