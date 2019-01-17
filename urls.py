@@ -1,17 +1,15 @@
-from cms.sitemaps import CMSSitemap
-from django.conf import settings
 from django.conf.urls import include, url
-from django.contrib import admin
-from django.contrib.sitemaps.views import sitemap
-from django.contrib.staticfiles.urls import staticfiles_urlpatterns
-from django.views.static import serve
 from django.contrib.auth.decorators import login_required
+from . import views
 
+#from django.conf import settings
+# from django.contrib import admin
+# from django.contrib.sitemaps.views import sitemap
+# from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+# from django.views.static import serve
 #from django.urls import path, include
-
-from . import views
 #from rest_framework import routers
-from . import views
+
 
 # router = routers.DefaultRouter()
 # router.register(r'issues', views.IssueViewSet)
