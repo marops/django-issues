@@ -9,14 +9,19 @@ from os import path
 from django.db.models import Count
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
+from .decorators import group_required
+from django.contrib.auth.models import User, Group
+from django.utils.html import escape
 
 @login_required
 def index(request):
     return render(request,'issues/index.html')
 
-@login_required
+@group_required('engineer')
 def test(request):
-    return render(request,'issues/test.html')
+    is_engineer = request.user.groups.filter(name='engineers').exists()
+    msg=f'is_engineer={is_engineer}'
+    return render(request,'issues/test.html', {'is_engineer':is_engineer})
 
 @login_required
 def dashboard(request):
@@ -96,26 +101,60 @@ class DTIssueListViewData(BaseDatatableView):
 
         return qs
 
+    def render_column(self, row, column):
+        """ Renders a column on a row. column can be given in a module notation eg. document.invoice.type
+        """
+        # try to find rightmost object
+        obj = row
+        parts = column.split('.')
+        for part in parts[:-1]:
+            if obj is None:
+                break
+            obj = getattr(obj, part)
+
+        # try using get_OBJECT_display for choice fields
+        if hasattr(obj, 'get_%s_display' % parts[-1]):
+            value = getattr(obj, 'get_%s_display' % parts[-1])()
+        else:
+            value = getattr(obj, parts[-1], None)
+
+        if value is None:
+            value = self.none_string
+
+        if self.escape_values:
+            value = escape(value)
+
+        # if value and hasattr(obj, 'get_absolute_url'):
+        #     return '<a href="%s">%s</a>' % (obj.get_absolute_url(), value)
+        return value
+
+
+
+
 # class DTIssueListView(TemplateView):
 #     template_name = 'issues/list3.html'
 #     headers=['Issue#','Short_Desc','Category','Created','Submitted By','Assigned To','Completed']
 #     extra_context={'headers': headers,'ajax_url':'/issues/list3/data'}
 
-@login_required
+@group_required('engineer')
 def issue_view(request,pk,action=None):
     """
+    New, Edit or Delete an Issue
 
     :param request:
     :param pk: Issue primary key. If 0 then creates new Issue
-    :param action: default None. ['delete' | None]
+    :param action: default None. ['new | delete' | None]
     :return: IssueForm, pk
     """
 
     success_url="/issues"
     pk=int(pk)
 
+    is_engineer = request.user.groups.filter(name='engineers').exists()
+
     if(pk>0):
         instance = Issue.objects.get(pk=pk)
+        success_url+=f'/{pk}'
     else:
         instance = None
 
@@ -133,24 +172,31 @@ def issue_view(request,pk,action=None):
         # check whether it's valid:
         if form.is_valid():
             # process the data in form.cleaned_data as required
-            form.save()
+            rc=form.save()
 
             # redirect to a new URL:
-            return HttpResponseRedirect(success_url)
+            return HttpResponseRedirect(reverse('issues:issue-detail', args=[rc.pk]))
 
     # if a GET (or any other method) we'll create a blank form
     else:
-        if(action=="delete"):
+        if (action=="delete"):
             #instance = Person.objects.get(pk=pk)
             return render(request, 'ticket/confirm_delete.html', {'object': instance,'success_url':success_url})
 
         form = IssueForm(initial={'submitted_by': request.user}, instance=instance)
 
-    return render(request, 'issues/issue.html', {'form': form, 'rid':pk})
+    return render(request, 'issues/issue.html', {'form': form, 'rid':pk, 'action':action, 'is_engineer':is_engineer})
 
 @login_required
 def issue_detail(request, pk):
+    """
+    View an Issue, and able to add a new Response
 
+    :param request:
+    :param pk: primary key for the Issue
+    :return:
+    """
+    can_edit = request.user.groups.filter(name='engineers').exists()
     if request.method == 'POST':
         form = ResponseForm(request.POST, request.FILES)
         if form.is_valid():
@@ -174,7 +220,7 @@ def issue_detail(request, pk):
         issue_responses=issue.response_set.all()
         response_form=ResponseForm(initial={'author': request.user, 'issue':issue.id})
 
-    return render(request, 'issues/detail.html', { 'object': issue, 'rid': pk,'issue_responses':issue_responses,'response_form':response_form })
+    return render(request, 'issues/detail.html', { 'object': issue, 'rid': pk,'issue_responses':issue_responses,'response_form':response_form, 'can_edit':can_edit })
 
 
 

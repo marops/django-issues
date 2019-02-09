@@ -16,8 +16,11 @@
 </style>
 
 <div style="margin: 0 0 ; font-size:11pt">
-    <h3>Issue Number {{object.pk}} <a href="{% url 'issues:issues-action' object.pk 'edit' %}"><button type="button" class="btn btn-sm" >Edit</button></a> </h3>
-
+    <h3>Issue Number {{object.pk}}
+    {% if can_edit %}
+        <a href="{% url 'issues:issues-action' object.pk 'edit' %}"><button type="button" class="btn btn-sm" >Edit</button></a>
+    {% endif %}
+    </h3>
     <b>Short Desc</b>: {{ object.short_desc }}
     <br/>
     <b>Created</b>: {{object.created_date | date:"Y-m-d H:i:s e"}}

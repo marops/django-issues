@@ -7,6 +7,7 @@ import datetime
 from django.contrib.auth.models import Group
 from django.urls import reverse
 from django.utils import timezone
+import pytz
 
 
 # Create your models here.
@@ -55,8 +56,11 @@ class Issue(models.Model):
         if self.completed:
             self.completed_date = datetime.datetime.now()
 
-        self.modified_date = datetime.datetime.now()
+        self.modified_date = datetime.datetime.now(pytz.utc)
         super(Issue, self).save()
+
+    def get_absolute_url(self):
+        return reverse('issues:issue-detail', args=[str(self.id)])
 
     #class Meta:
         #ordering = ["created_date"]
@@ -69,7 +73,7 @@ class Response(models.Model):
     """
     author = models.ForeignKey(settings.AUTH_USER_MODEL,related_name='response_author', on_delete=models.CASCADE)
     issue = models.ForeignKey(Issue, on_delete=models.CASCADE)
-    date = models.DateTimeField(default=datetime.datetime.now)
+    date = models.DateTimeField(default=timezone.now)
     text = models.TextField(blank=True)
 
     def snippet(self):

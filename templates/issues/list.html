@@ -33,7 +33,7 @@
 
 <script>
         $('#example').DataTable({
-            "ajax": "{% url 'issues:list-data' %}{{ajax_url}}",
+            "ajax": "{{ajax_url}}",
             "data": {
                 "submitted_by": 1
             },

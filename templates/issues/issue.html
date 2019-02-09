@@ -13,6 +13,9 @@
     #div_id_submitted_by, #div_id_assigned_to {float:left;width:14em;}
     #div_id_completed {clear:left;}
 
+    {% if action == 'new' %}
+    #div_id_assigned_to,#div_id_created_date, #div_id_completed_date, #div_id_due_date, #div_id_completed, #div_id_priority, #div_id_resolution, #div_id_tags {display:none}
+    {% endif %}
 
 </style>
 {% if rid > 0 %}
@@ -24,6 +27,7 @@
     {% csrf_token %}
     {{ form|crispy }}
     <input type="hidden" id="id" name="id" value="3">
+    <div style="clear:left"></div>
     <input type="submit" class="btn btn-primary" value="Submit" />
     {% if rid > 0 %}
     <a href="/issues/{{rid}}/delete/" class="btn btn-primary" value="Delete" />Delete</a>
@@ -52,6 +56,18 @@
             $("#id_completed_date").val("")
         }
     });
+
+    //some fields when a new entry, this will toggle them on
+    function showHidden(){
+        $("#div_id_assigned_to").toggle()
+        $("#div_id_created_date").toggle()
+        $("#div_id_completed_date").toggle()
+        $("#div_id_due_date").toggle()
+        $("#div_id_completed").toggle()
+        $("#div_id_priority").toggle()
+        $("#div_id_resolution").toggle()
+        $("#div_id_tags").hide()
+    }
 
 
 </script>
