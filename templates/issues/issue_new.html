@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+<style>
+    #id_category, #id_submitted_by {width:12em}
+    #id_created_date, #id_due_date, #id_completed_date {width:14em;}
+    #id_assigned_to, #id_submitted_by { width: 12em}
+    #id_priority { width: 4em}
+    //#id_title {max-width:400px}
+    form {max-width:1000px;margin: 0 auto}
+    #div_id_created_date {clear:left}
+    #div_id_created_date, #div_id_due_date, #div_id_completed_date {float:left;padding-right:1em;width:16em}
+    #div_id_submitted_by, #div_id_assigned_to {float:left;width:14em;}
+    #div_id_completed {clear:left;}
+
+    {% if action == 'new' %}
+    #div_id_assigned_to,#div_id_created_date, #div_id_completed_date, #div_id_due_date, #div_id_completed, #div_id_priority, #div_id_resolution, #div_id_tags {display:none}
+    {% endif %}
+
+</style>
+{% if rid > 0 %}
+<h2>Issue Number {{rid}}</h2>
+{% else %}
+<h2>New Issue</h2>
+{% endif %}
+<form method="post">
+    {% csrf_token %}
+    {{ form|crispy }}
+    <input type="hidden" id="id" name="id" value="3">
+    <div style="clear:left"></div>
+    <input type="submit" class="btn btn-primary" value="Submit" />
+
+</form>
+
+<script>
+
+
+</script>
+
+{% endblock %}

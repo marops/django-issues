@@ -1,9 +1,8 @@
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
-from django.views.generic import View, ListView, DeleteView, DetailView
 from .models import Issue, Response, Category, Document
 from django.utils import timezone
-from .forms import IssueForm, ResponseForm
+from .forms import IssueForm, ResponseForm, IssueNewForm
 from django.core.files.storage import default_storage
 from os import path
 from django.db.models import Count
@@ -136,7 +135,31 @@ class DTIssueListViewData(BaseDatatableView):
 #     headers=['Issue#','Short_Desc','Category','Created','Submitted By','Assigned To','Completed']
 #     extra_context={'headers': headers,'ajax_url':'/issues/list3/data'}
 
-@group_required('engineer')
+from .mail import *
+
+@login_required
+def issue_new(request):
+
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = IssueForm(request.POST)
+
+        # check whether it's valid:
+        if form.is_valid():
+            # process the data in form.cleaned_data as requfrom django.core.mail import send_mailired
+            rc=form.save()
+
+            # mail to submitted_by and engineers
+            new_issue_mail(request,rc)
+            # redirect to a new URL:
+            return HttpResponseRedirect(reverse('issues:issue-detail',args=[rc.pk]))
+    else:
+        form = IssueNewForm(initial={'submitted_by': request.user})
+
+    return render(request, 'issues/issue_new.html', {'form': form})
+
+
+@group_required('engineers')
 def issue_view(request,pk,action=None):
     """
     New, Edit or Delete an Issue

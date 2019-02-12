@@ -36,6 +36,7 @@ urlpatterns = [
     url(r'^list/data/', login_required(views.DTIssueListViewData.as_view()), name='list-data'),
     url(r'(?P<pk>\d+)/(?P<action>\w+)/$', views.issue_view, name='issues-action'),
     url(r'(?P<pk>\d+)/$', views.issue_detail, name='issue-detail'),
+    url(r'^new/$', views.issue_new, name='issue-new'),
     url(r'^test', views.test)
 
     # url(r'^list/data/', views.DTIssueListViewData.as_view(), name='issues-list-data'),

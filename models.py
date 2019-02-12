@@ -34,7 +34,7 @@ class Issue(models.Model):
     completed_date = models.DateTimeField(blank=True, null=True)
     completed = models.BooleanField(default=False)
     modified_date = models.DateTimeField(blank=True, null=True)
-    priority = models.PositiveIntegerField(default=1)
+    priority = models.PositiveIntegerField(default=1,blank=True, null=True)
     resolution = models.TextField(blank=True, null=True)
     tags = models.CharField(max_length=255,blank=True, null=True)
 
@@ -73,7 +73,7 @@ class Response(models.Model):
     """
     author = models.ForeignKey(settings.AUTH_USER_MODEL,related_name='response_author', on_delete=models.CASCADE)
     issue = models.ForeignKey(Issue, on_delete=models.CASCADE)
-    date = models.DateTimeField(default=timezone.now)
+    date = models.DateTimeField(default=timezone.now,blank=True, null=True)
     text = models.TextField(blank=True)
 
     def snippet(self):
