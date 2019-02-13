@@ -135,7 +135,7 @@ class DTIssueListViewData(BaseDatatableView):
 #     headers=['Issue#','Short_Desc','Category','Created','Submitted By','Assigned To','Completed']
 #     extra_context={'headers': headers,'ajax_url':'/issues/list3/data'}
 
-from .mail import *
+from .mail import new_issue_mail, new_issue_response_mail
 
 @login_required
 def issue_new(request):
@@ -179,7 +179,8 @@ def issue_view(request,pk,action=None):
         instance = Issue.objects.get(pk=pk)
         success_url+=f'/{pk}'
     else:
-        instance = None
+        #instance = None
+        return HttpResponseRedirect(reverse('issues:issue-new'))
 
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
@@ -206,7 +207,7 @@ def issue_view(request,pk,action=None):
             #instance = Person.objects.get(pk=pk)
             return render(request, 'ticket/confirm_delete.html', {'object': instance,'success_url':success_url})
 
-        form = IssueForm(initial={'submitted_by': request.user}, instance=instance)
+        form = IssueForm(instance=instance)
 
     return render(request, 'issues/issue.html', {'form': form, 'rid':pk, 'action':action, 'is_engineer':is_engineer})
 
@@ -220,6 +221,10 @@ def issue_detail(request, pk):
     :return:
     """
     can_edit = request.user.groups.filter(name='engineers').exists()
+
+    issue = Issue.objects.get(pk=pk)
+
+    #If there is POST data then a new Response was submitted
     if request.method == 'POST':
         form = ResponseForm(request.POST, request.FILES)
         if form.is_valid():
@@ -233,13 +238,15 @@ def issue_detail(request, pk):
                 d = Document(file=fn,response_id=rs)
                 d.save()
 
+            #send email to author and (assigned_to or engineer group)
+            new_issue_response_mail(request, issue, rs)
+
             #s='/issues/{}'.format(pk,)
             return HttpResponseRedirect(request.path)
         else:
             #TODO Form Validation Error Page
             return HttpResponseRedirect('/')
     else:
-        issue=Issue.objects.get(pk=pk)
         issue_responses=issue.response_set.all()
         response_form=ResponseForm(initial={'author': request.user, 'issue':issue.id})
 

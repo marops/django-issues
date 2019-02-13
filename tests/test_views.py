@@ -15,23 +15,12 @@ class IssueTest(TestCase):
         u.groups.add(g)
 
         #add another user into engineers group
-        u=User.objects.create_user(username="ernie",email="hr3dt@leidos.com", password="Lidar")
+        u=User.objects.create_user(username="ernie",email="ernie@hr3d.leidos.com", password="Lidar")
         u.groups.add(g)
 
-        #print(f'ENGINEERS GROUP:{g.user_set.all()}')
+        #add another user into regular account. ie no group
+        u=User.objects.create_user(username="oscar",email="oscar.@hr3d.leidos.com", password="Lidar")
 
-        # c=Category.objects.get(name="general")
-        # u=User.objects.get(username="todd")
-        # #print(f'USER:{u.id},{u.is_staff}')
-        # number_of_issues = 3
-        #
-        # for issue_id in range(number_of_issues):
-        #     Issue.objects.create(
-        #         id=issue_id+1,
-        #         short_desc=f'Test {issue_id}',
-        #         category=c,
-        #         submitted_by=u
-        #     )
 
     def setUp(self):
         #login = self.client.login(username='todd', password='Lidar')
@@ -61,26 +50,61 @@ class IssueTest(TestCase):
         self.assertRegex(response.url,r"^\/issues\/\d*\/")
         issue=Issue.objects.get(short_desc="Test1")
 
+        self.assertEqual(len(mail.outbox), 1)
 
-        # data={'author':u.id,'issue':issue.id,'text':'Test1.1'}
-        # form=ResponseForm(data)
-        # self.assertTrue(form.is_valid(),form.errors.as_json())
-        #
-        # response = self.client.post(f'/issues/{issue.pk}/',data)
-        # issue_response=Response.objects.get(text='Test1.1')
-        # self.assertRedirects(response, f'/issues/{issue.pk}/')
-        #
-        # response = self.client.get(f'/issues/{issue.pk}/')
-        # print(f'RESPONSE2:{response}')
-        #
-        # #check email sent, should be
+        #add a response
+        data={'author':u.id,'issue':issue.id,'text':'Test1.1'}
+        form=ResponseForm(data)
+        self.assertTrue(form.is_valid(),form.errors.as_json())
+        response = self.client.post(f'/issues/{issue.id}/', data)
+        print(f'RESPONSE:(IssueID {issue.id}, {response}')
+        self.assertEqual(issue.response_set.all().count(),1)
+        print(f'ISSUE RESPONSE: {issue.response_set.all()}')
 
+        self.assertEqual(len(mail.outbox),2)
+
+        mc=[]
+        for m in mail.outbox:
+            mc.append(f'{m.to}, {m.subject}')
+
+        print(f'EMAILS: (Issue ID {issue.id}), (Response Count {issue.response_set.all().count()}), (Mail count {len(mc)}), {mc}')
+
+
+    def test_operater_new_issue(self):
+
+        c = Category.objects.get(name="general")
+        u = User.objects.get(username="oscar")
+
+        #login as oscar
+        login = self.client.login(username='oscar', password='Lidar')
+
+        #new issue
+        data = {'short_desc': 'Test1', 'desc': 'Test 1 desc', 'submitted_by': u.id, 'category': c.id}
+        form = IssueForm(data)
+        self.assertTrue(form.is_valid(),form.errors.as_json())
+
+        response=self.client.post('/issues/new/',data)
+
+        print(f'TEST_OPERATOR RESPONSE:{response}')
+        self.assertRegex(response.url,r"^\/issues\/\d*\/")
+        issue=Issue.objects.get(short_desc="Test1")
+
+        #check mail, addressed to oscar (submitted_by) and all in engineer group
         self.assertEqual(len(mail.outbox), 1)
         mc=[]
         for m in mail.outbox:
             mc.append(f'{m.to}, {m.subject}')
-            
-        print(f'EMAILS: (Issue ID {issue.id}) {mc}')
+        print(f'TEST_OPERATOR EMAILS: (Issue ID {issue.id}), (Submitted_by {issue.submitted_by}), {mc}')
+
+        #assign to ernie
+        issue.assigned_to=User.objects.get(username="ernie")
+        issue.save()
+        issue=Issue.objects.get(short_desc="Test1")
+        print(f'TEST OPERATOR SHOULD BE ERNIE {issue.assigned_to}')
+
+        #add response
+        #check mail should be addressed ro oscar and ernie
+
 
 
     def test_issue_editing_is_restricted(self):
