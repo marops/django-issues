@@ -38,18 +38,26 @@ def issues_list(request):
     title="Open Issues"
     f=request.GET.get('f',None)
 
+    is_manager=request.user.is_staff | request.user.is_superuser | request.user.groups.filter(name="engineers").exists()
+
     filter = ""
-    if f=='mine':   #show issues assigned to user
-        filter+="{}={}".format('assigned_to', request.user.id)
-        title="My Open Issues"
 
-    if f=='ua':
-        filter+="{}={}".format('assigned_to', 0)
-        title="Unassigned Issues"
+    if is_manager:
+        if f=='mine':   #show issues assigned to user
+            filter+="{}={}".format('assigned_to', request.user.id)
+            title="My Open Issues"
 
-    if f=='completed':
-        filter+="{}={}".format('completed', 1)
-        title="Completed Issues"
+        if f=='ua':
+            filter+="{}={}".format('assigned_to', 0)
+            title="Unassigned Issues"
+
+        if f=='completed':
+            filter+="{}={}".format('completed', 1)
+            title="Completed Issues"
+
+    else:
+        filter += "{}={}".format('submitted_by', request.user.id)
+        title = "My Issues"
 
     if len(filter)>0:
         filter="?"+filter
@@ -59,6 +67,7 @@ def issues_list(request):
     #s='{}{}{}'.format(request.META['HTTP_HOST'],reverse('issues-list-data'),filter,)
     s = '{}{}'.format(reverse('issues:list-data'), filter, )
     extra_context={'headers': headers,'ajax_url':s, 'title':title}
+
     return render(request,template_name,extra_context)
 
 
@@ -97,6 +106,12 @@ class DTIssueListViewData(BaseDatatableView):
         else:
             qs = qs.filter(completed=False)
 
+        filter_submitted_by = self.request.GET.__contains__('submitted_by')
+        if filter_submitted_by:
+            submitter=self.request.GET.get('submitted_by')
+            if not submitter:
+                submitter=self.request.user.id
+            qs = qs.filter(submitted_by__exact=submitter)
 
         return qs
 
