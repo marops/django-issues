@@ -48,6 +48,7 @@ class IssueTest(TestCase):
         #must be in engineers group or is_staff or is_superuser
 
         self.assertRegex(response.url,r"^\/issues\/\d*\/")
+
         issue=Issue.objects.get(short_desc="Test1")
 
         self.assertEqual(len(mail.outbox), 1)
@@ -57,9 +58,9 @@ class IssueTest(TestCase):
         form=ResponseForm(data)
         self.assertTrue(form.is_valid(),form.errors.as_json())
         response = self.client.post(f'/issues/{issue.id}/', data)
-        print(f'RESPONSE:(IssueID {issue.id}, {response}')
+        #print(f'RESPONSE:(IssueID {issue.id}, {response}')
         self.assertEqual(issue.response_set.all().count(),1)
-        print(f'ISSUE RESPONSE: {issue.response_set.all()}')
+        #print(f'ISSUE RESPONSE: {issue.response_set.all()}')
 
         self.assertEqual(len(mail.outbox),2)
 
@@ -67,7 +68,7 @@ class IssueTest(TestCase):
         for m in mail.outbox:
             mc.append(f'{m.to}, {m.subject}')
 
-        print(f'EMAILS: (Issue ID {issue.id}), (Response Count {issue.response_set.all().count()}), (Mail count {len(mc)}), {mc}')
+        #print(f'EMAILS: (Issue ID {issue.id}), (Response Count {issue.response_set.all().count()}), (Mail count {len(mc)}), {mc}')
 
 
     def test_operater_new_issue(self):
@@ -85,7 +86,7 @@ class IssueTest(TestCase):
 
         response=self.client.post('/issues/new/',data)
 
-        print(f'TEST_OPERATOR RESPONSE:{response}')
+        #print(f'TEST_OPERATOR RESPONSE:{response}')
         self.assertRegex(response.url,r"^\/issues\/\d*\/")
         issue=Issue.objects.get(short_desc="Test1")
 
@@ -94,17 +95,73 @@ class IssueTest(TestCase):
         mc=[]
         for m in mail.outbox:
             mc.append(f'{m.to}, {m.subject}')
-        print(f'TEST_OPERATOR EMAILS: (Issue ID {issue.id}), (Submitted_by {issue.submitted_by}), {mc}')
+        #print(f'TEST_OPERATOR EMAILS: (Issue ID {issue.id}), (Submitted_by {issue.submitted_by}), {mc}')
 
         #assign to ernie
         issue.assigned_to=User.objects.get(username="ernie")
         issue.save()
         issue=Issue.objects.get(short_desc="Test1")
-        print(f'TEST OPERATOR SHOULD BE ERNIE {issue.assigned_to}')
+        #print(f'TEST OPERATOR SHOULD BE ERNIE {issue.assigned_to}')
 
         #add response
         #check mail should be addressed ro oscar and ernie
 
+
+    def test_view_issues_list(self):
+        """
+        This test the /issues/list view.
+
+        1. Non managers (is_staff, is_superuser, in engineers group) list view should only show
+        those items submitted by the logged in non manager.
+
+        2. If manager is logged in /issues/list should show list of all open issues
+
+        :return:
+        """
+        c = Category.objects.get(name="general")
+        u = User.objects.get(username="oscar")
+
+        #login as oscar
+        login = self.client.login(username='oscar', password='Lidar')
+
+        #new issue
+        data = {'short_desc': 'Test1', 'desc': 'Test 1 desc', 'submitted_by': u.id, 'category': c.id}
+        form = IssueForm(data)
+        form.save()
+
+        #Non Manger logged in
+        response=self.client.get('/issues/list/')
+        #print(f'VIEW ISSUES (NON MGR): {response}')
+        self.assertContains(response,'<h2>My Issues</h2>',html=True)
+        self.assertContains(response, f'ajax": "/issues/list/data/?submitted_by={u.id}"')
+
+        #Manager Logged in
+        login = self.client.login(username='ernie', password='Lidar')
+        response=self.client.get('/issues/list/')
+        #print(f'VIEW ISSUES (MGR): {response}')
+        self.assertContains(response,'<h2>Open Issues</h2>',html=True)
+        self.assertContains(response, f'"ajax": "/issues/list/data/"')
+
+
+    def test_view_index(self):
+        """
+        Tests index
+
+        1. Manger redirects to dashboard.
+        2. Non Manager redirects to list. Lists logged in users submitted issues
+        """
+
+        #manager redirects to dashboard
+        login = self.client.login(username='ernie', password='Lidar')
+        response=self.client.get('/issues/')
+        #print(f'VIEW INDEX (MGR): {response}')
+        self.assertRedirects(response,"/issues/dashboard/")
+
+        #non manager redirects to list of logged in submitted issues
+        login = self.client.login(username='oscar', password='Lidar')
+        response=self.client.get('/issues/')
+        #print(f'VIEW INDEX (MGR): {response}')
+        self.assertRedirects(response,"/issues/list/")
 
 
     def test_issue_editing_is_restricted(self):
@@ -121,7 +178,7 @@ class IssueTest(TestCase):
 
 
 
-    def _test_redirect_if_not_logged_in(self):
+    def test_redirect_if_not_logged_in(self):
         response = self.client.get('/issues/')
         self.assertRedirects(response, '/accounts/login/?next=/issues/')
 

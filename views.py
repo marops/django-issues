@@ -14,6 +14,15 @@ from django.utils.html import escape
 
 @login_required
 def index(request):
+    is_manager=request.user.is_staff | request.user.is_superuser | request.user.groups.filter(name="engineers").exists()
+
+    #If manager the ngo to dashboard
+    if is_manager:
+        return HttpResponseRedirect(reverse('issues:dashboard'))
+    else:
+        #if non manager go to the list of the logged in user
+        return HttpResponseRedirect(reverse('issues:list'))
+
     return render(request,'issues/index.html')
 
 @group_required('engineer')
@@ -271,9 +280,9 @@ def issue_detail(request, pk):
 
 
 #Other list possibilities - not currently used
-# def rest(request):
-#     # View code here...
-#     return render(request, 'issues/list2.html', {})
+def rest(request):
+    # View code here...
+    return render(request, 'issues/list2.html', {})
 #
 # from .tables import IssueTable
 # from django_tables2 import RequestConfig
@@ -304,16 +313,17 @@ def issue_detail(request, pk):
 #         return context
 #
 
-# from rest_framework import viewsets
-# from .serializers import  IssueSerializer, ResponseSerializer, UserSerializer, GroupSerializer
-#
-# class IssueViewSet(viewsets.ModelViewSet):
-#     """
-#     API endpoint that allows users to be viewed or edited.
-#     """
-#     queryset = models.Issue.objects.all().order_by('-created_date')
-#     serializer_class = IssueSerializer
-#
+from rest_framework import viewsets
+#from .serializers import  IssueSerializer, ResponseSerializer, UserSerializer, GroupSerializer
+from .serializers import  IssueSerializer, GroupSerializer
+
+class IssueViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = Issue.objects.all().order_by('-created_date')
+    serializer_class = IssueSerializer
+
 # class UserViewSet(viewsets.ModelViewSet):
 #     """
 #     API endpoint that allows users to be viewed or edited.
@@ -321,9 +331,10 @@ def issue_detail(request, pk):
 #     queryset = User.objects.all().order_by('-date_joined')
 #     serializer_class = UserSerializer
 #
-# class GroupViewSet(viewsets.ModelViewSet):
-#     """
-#     API endpoint that allows groups to be viewed or edited.
-#     """
-#     queryset = Group.objects.all()
-#     serializer_class = GroupSerializer
+#
+class GroupViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows groups to be viewed or edited.
+    """
+    queryset = Group.objects.all()
+    serializer_class = GroupSerializer
