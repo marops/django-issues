@@ -31,7 +31,11 @@ class IssueTestClass(TestCase):
         pass
 
     def test_instance(self):
-        rest="data/issues/"
+        """
+        Test for data returned by restframework
+
+        :return:
+        """
         u=User.objects.get(username="ernie")
         c=Category.objects.get(name="general")
 
@@ -46,7 +50,7 @@ class IssueTestClass(TestCase):
         self.assertTrue(issue.created_date)
         self.assertTrue(issue.modified_date)
 
-        self.assertEqual(issue.get_absolute_url(),f'/issues/{self.rest}{issue.id}/')
+        self.assertEqual(issue.get_absolute_url(),f'/issues/{issue.id}/')
 
 
     # def test_reponse(self):

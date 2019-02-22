@@ -22,8 +22,13 @@ class IssuesMenu(CMSAttachMenu):
         #     id=1,  # unique id for this node within the menu
         # )
 
-        nodes.append(NavigationNode(title='New Issue', url='/issues/new', id=1))
-        nodes.append(NavigationNode(title='Dashboard', url='/issues/dashboard', id=2))
+        is_manager = request.user.is_staff | request.user.is_superuser | request.user.groups.filter(
+            name="engineers").exists()
+
+        nodes.append(NavigationNode(title='My Issues', url='/issues/list', id=1))
+        nodes.append(NavigationNode(title='New Issue', url='/issues/new', id=2))
+        if is_manager:
+            nodes.append(NavigationNode(title='Dashboard', url='/issues/dashboard', id=3))
 
         # n = NavigationNode(_('sample settings page'), "/bye/", 2)
         # nodes.append(n)

@@ -36,12 +36,12 @@ def test(request):
 def dashboard(request):
     sql="select i.id, i.category_id,c.name,count(*) from issues_issue i left join issues_category c on i.category_id=c.id where not i.completed group by c.name"
 
-    my_open_issues=Issue.objects.filter(completed=False).filter(assigned_to=request.user.id).count()
+    my_issues=Issue.objects.filter(Q(assigned_to=request.user.id)|Q(submitted_by=request.user.id)&Q(completed=False)).count()
     open_issues=Issue.objects.filter(completed=False).count()
     open_issues_by_category = Issue.objects.filter(completed=False).values('category__name').annotate(total=Count('category'))
-    unassigned_open_issues=Issue.objects.filter(completed=False).filter(assigned_to=None).count()
+    unassigned_issues=Issue.objects.filter(completed=False).filter(assigned_to=None).count()
 
-    return render(request, 'issues/dashboard.html', {'my_open_issues':my_open_issues,'open_issues':open_issues,'unassigned_open_issues':unassigned_open_issues})
+    return render(request, 'issues/dashboard.html', {'my_issues':my_issues,'open_issues':open_issues,'unassigned_issues':unassigned_issues})
 
 @login_required
 def issues_list(request):
@@ -58,20 +58,23 @@ def issues_list(request):
             f='mine'
 
         if f=='mine':   #show issues assigned to user
-            filter+="{}={}".format('assigned_to', request.user.id)
-            filter+="&{}={}".format('submitted_by', request.user.id)
-            title="My Open Issues"
+            filter+=f'assigned_to={request.user.id}&submitted_by={request.user.id}'
+            title="My Issues"
 
         if f=='ua':
-            filter+="{}={}".format('assigned_to', 0)
+            filter+=f'assigned_to=0&completed=0'
             title="Unassigned Issues"
+
+        if f=='oi':
+            filter+=f'completed=0'
+            title="Open Issues"
 
         #Default for manager is to only show not completed
         # if f=='completed':
-        if len(filter) > 0:
-            filter+="&"
-        filter+="{}={}".format('completed', 0)
-        title="Completed Issues"
+        # if len(filter) > 0:
+        #     filter="&"
+        # #filter+="{}={}".format('completed', 0)
+        #title="Completed Issues"
 
     else:
         filter += f"submitted_by={request.user.id}"
@@ -85,6 +88,8 @@ def issues_list(request):
     #s='{}{}{}'.format(request.META['HTTP_HOST'],reverse('issues-list-data'),filter,)
     s = '{}{}'.format(reverse('issues:list-data'), filter, )
     extra_context={'headers': headers,'ajax_url':s, 'title':title, 'is_manager':is_manager}
+
+    #print(filter)
 
     return render(request,template_name,extra_context)
 

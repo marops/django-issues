@@ -13,16 +13,16 @@
     </thead>
     <tbody>
         <tr>
-            <td><a href="{% url 'issues:list' %}?f=mine">My Open Issues</a></td>
-            <td>{{my_open_issues}}</td>
+            <td><a href="{% url 'issues:list' %}">My Issues</a></td>
+            <td>{{my_issues}}</td>
         </tr>
         <tr>
-            <td><a href="{% url 'issues:list' %}">Open Issues</a></td>
+            <td><a href="{% url 'issues:list' %}?f=oi">Open Issues</a></td>
             <td>{{open_issues}}</td>
         </tr>
          <tr>
             <td><a href="{% url 'issues:list' %}?f=ua">Unassigned Issues</a></td>
-             <td>{{unassigned_open_issues}}</td>
+             <td>{{unassigned_issues}}</td>
         </tr>
 
     </tbody>

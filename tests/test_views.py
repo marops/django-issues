@@ -131,17 +131,32 @@ class IssueTest(TestCase):
 
         #Non Manger logged in
         response=self.client.get('/issues/list/')
-        #print(f'VIEW ISSUES (NON MGR): {response}')
+        #print(f'VIEW ISSUES (NON MGR): {response.content}')
         self.assertContains(response,'<h2>My Issues</h2>',html=True)
         self.assertContains(response, f'ajax": "/issues/list/data/?submitted_by={u.id}"')
 
-        #Manager Logged in
-        login = self.client.login(username='ernie', password='Lidar')
-        response=self.client.get('/issues/list/')
-        #print(f'VIEW ISSUES (MGR): {response}')
-        self.assertContains(response,'<h2>Open Issues</h2>',html=True)
-        self.assertContains(response, f'"ajax": "/issues/list/data/"')
+        response=self.client.get(f'/issues/list/data/?assigned_to=2&submitted_by={u.id}')
+        self.assertContains(response, '"recordsTotal": 1, "recordsFiltered": 1')
 
+        #Manager Logged in
+        u = User.objects.get(username="ernie")
+        login = self.client.login(username='ernie', password='Lidar')
+
+        #check My Issues which is default
+        response=self.client.get('/issues/list/')
+        #print(f'VIEW ISSUES (MGR): {response.content}')
+        self.assertContains(response,'<h2>My Issues</h2>',html=True)
+        self.assertContains(response, f'"ajax": "/issues/list/data/?assigned_to=2&amp;submitted_by={u.id}"')
+
+        #Check unassigned issues
+        response=self.client.get('/issues/list/?f=ua')
+        self.assertContains(response,'<h2>Unassigned Issues</h2>',html=True)
+        self.assertContains(response, f'"ajax": "/issues/list/data/?assigned_to=0&amp;completed=0"')
+
+        #Check open issues
+        response=self.client.get('/issues/list/?f=oi')
+        self.assertContains(response,'<h2>Open Issues</h2>',html=True)
+        self.assertContains(response, f'"ajax": "/issues/list/data/?completed=0"')
 
     def test_view_index(self):
         """
