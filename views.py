@@ -11,6 +11,7 @@ from django.contrib.auth.decorators import login_required
 from .decorators import group_required
 from django.contrib.auth.models import User, Group
 from django.utils.html import escape
+from django.db.models import Q
 
 @login_required
 def index(request):
@@ -52,20 +53,28 @@ def issues_list(request):
     filter = ""
 
     if is_manager:
+
+        if not f:
+            f='mine'
+
         if f=='mine':   #show issues assigned to user
             filter+="{}={}".format('assigned_to', request.user.id)
+            filter+="&{}={}".format('submitted_by', request.user.id)
             title="My Open Issues"
 
         if f=='ua':
             filter+="{}={}".format('assigned_to', 0)
             title="Unassigned Issues"
 
-        if f=='completed':
-            filter+="{}={}".format('completed', 1)
-            title="Completed Issues"
+        #Default for manager is to only show not completed
+        # if f=='completed':
+        if len(filter) > 0:
+            filter+="&"
+        filter+="{}={}".format('completed', 0)
+        title="Completed Issues"
 
     else:
-        filter += "{}={}".format('submitted_by', request.user.id)
+        filter += f"submitted_by={request.user.id}"
         title = "My Issues"
 
     if len(filter)>0:
@@ -75,7 +84,7 @@ def issues_list(request):
     headers=['Issue#','Short_Desc','Category','Created','Submitted By','Assigned To','Completed']
     #s='{}{}{}'.format(request.META['HTTP_HOST'],reverse('issues-list-data'),filter,)
     s = '{}{}'.format(reverse('issues:list-data'), filter, )
-    extra_context={'headers': headers,'ajax_url':s, 'title':title}
+    extra_context={'headers': headers,'ajax_url':s, 'title':title, 'is_manager':is_manager}
 
     return render(request,template_name,extra_context)
 
@@ -95,7 +104,7 @@ class DTIssueListViewData(BaseDatatableView):
         # these are simply objects displayed in datatable
         # You should not filter data returned here by any filter values entered by user. This is because
         # we need some base queryset to count total number of records.
-        return Issue.objects.filter(completed=False)
+        return Issue.objects.all()
 
     def filter_queryset(self, qs):
         # simple example:
@@ -103,26 +112,36 @@ class DTIssueListViewData(BaseDatatableView):
         if search:
             qs = qs.filter(short_desc__istartswith=search)
 
+        q0=Q()
+
+        #submitted_by
+        filter_submitted_by = self.request.GET.get('submitted_by', None)
+        if filter_submitted_by:
+            q0=q0|Q(submitted_by=filter_submitted_by)
+
+        #assigned_to
         filter_assigned_to = self.request.GET.get('assigned_to', None)
         if filter_assigned_to:
             if filter_assigned_to == '0':
                 filter_assigned_to=None
-            qs = qs.filter(assigned_to__exact=filter_assigned_to)
+            q0=q0|Q(assigned_to__exact=filter_assigned_to)
 
         filter_completed = self.request.GET.get('completed', None)
         if filter_completed:
-            qs = qs.filter(completed=True)
-        else:
-            qs = qs.filter(completed=False)
+            if filter_completed == '1': #only completed
+                q0 = q0 & Q(completed=True)
+            else: #only not completed
+                q0 = q0 & Q(completed=False)
+            #otherwise it will show both
 
-        filter_submitted_by = self.request.GET.__contains__('submitted_by')
-        if filter_submitted_by:
-            submitter=self.request.GET.get('submitted_by')
-            if not submitter:
-                submitter=self.request.user.id
-            qs = qs.filter(submitted_by__exact=submitter)
+        # filter_submitted_by = self.request.GET.__contains__('submitted_by')
+        # if filter_submitted_by:
+        #     submitter=self.request.GET.get('submitted_by')
+        #     if not submitter:
+        #         submitter=self.request.user.id
+        #     qs = qs.filter(submitted_by__exact=submitter)
 
-        return qs
+        return qs.filter(q0)
 
     def render_column(self, row, column):
         """ Renders a column on a row. column can be given in a module notation eg. document.invoice.type

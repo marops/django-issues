@@ -12,10 +12,10 @@ from . import views
 from rest_framework import routers
 
 
-router = routers.DefaultRouter()
-router.register(r'issues', views.IssueViewSet)
-#router.register(r'users', views.UserViewSet)
-router.register(r'groups', views.GroupViewSet)
+# router = routers.DefaultRouter()
+# router.register(r'issues', views.IssueViewSet)
+# #router.register(r'users', views.UserViewSet)
+# router.register(r'groups', views.GroupViewSet)
 
 app_name = 'issues'
 
@@ -29,7 +29,7 @@ urlpatterns = [
     path('new/',views.issue_new, name='issue-new'),
     path('test/',views.test, name='issues-test'),
     path('rest/', views.rest, name='rest'),
-    path('data/', include(router.urls)),
+    #path('data/', include(router.urls)),
 ]
 
 
