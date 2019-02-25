@@ -42,7 +42,7 @@ def new_issue_mail(request,issue):
     for u in rs:
         mail_to.add(u.email)
 
-    subject = f'New Issue {issue.id} Created'
+    subject = f'New Issue ({issue.id}) {issue.short_desc[0:30]} '
     message = f"""
 A new issue has been submitted and can be viewed at {request.build_absolute_uri(f"/issues/{issue.id}")}
 
@@ -62,7 +62,7 @@ HR3D_ENG@lediso.com
     send_mail(
         subject,
         message,
-        'noreply@leidos.com',
+        'noreply@hr3d.leidos.com',
         mail_to.list,
         fail_silently=False,
     )
@@ -90,7 +90,7 @@ def new_issue_response_mail(request,issue,issue_response):
         for u in rs:
             mail_to.add(u.email)
 
-    subject = f'New Response to Issue {issue.id} Submitted'
+    subject = f'New Response to Issue ({issue.id}) {issue.short_desc[0:30]}'
     message = f"""
 A new response to issue {issue.id} ({issue.short_desc}) has been submitted and can be viewed at {request.build_absolute_uri(f"/issues/{issue.id}")}.
 
@@ -107,7 +107,7 @@ HR3D_ENG@ledios.com
     send_mail(
         subject,
         message,
-        'noreply@leidos.com',
+        'noreply@hr3d.leidos.com',
         mail_to.list,
         fail_silently=False,
     )
