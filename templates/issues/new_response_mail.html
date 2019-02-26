@@ -1,0 +1,14 @@
+{% autoescape off %}
+
+<p>A new response to <b>Issue #{{issue_id}} - ({{short_desc}})</b> has been submitted and can be viewed at <a href="{{link}}"><b>{{link}}</b></a>. Please do not reply to this email.</p>
+
+<p><b>Response From:</b> {{author}} </p>
+
+<p><b>Text:</b></p>
+
+<pre style="white-space: pre-wrap;margin:0px 10px">
+{{text}}
+</pre>
+<br>
+
+{% endautoescape %}

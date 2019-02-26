@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User, Group
 from django.core.mail import send_mail
-
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
 
 class MailList:
     """
@@ -42,22 +43,22 @@ def new_issue_mail(request,issue):
     for u in rs:
         mail_to.add(u.email)
 
-    subject = f'New Issue ({issue.id}) {issue.short_desc[0:30]} '
-    message = f"""
-A new issue has been submitted and can be viewed at {request.build_absolute_uri(f"/issues/{issue.id}")}
+    subject = f'New Issue ({issue.id}) {issue.short_desc[0:50]} '
+    message = render_to_string('issues/new_issue_mail_txt.html', {
+        'submitted_by': issue.submitted_by.username,
+        'link': request.build_absolute_uri(f"/issues/{issue.id}"),
+        'short_desc' : issue.short_desc,
+        'desc' : issue.desc,
+    })
 
-Please do not respond to this email. Use the link above to submit a response.
+    html_message=render_to_string('issues/new_issue_mail.html', {
+        'submitted_by': issue.submitted_by.username,
+        'link': request.build_absolute_uri(f"/issues/{issue.id}"),
+        'short_desc' : issue.short_desc,
+        'desc' : issue.desc,
+    })
 
-SHORT DESCRIPTION: {issue.short_desc}
-
-DESCRIPTION:
-
-{issue.desc}
-
-HR3D Engineering Team
-HR3D_ENG@lediso.com
-
-    """
+    #message=strip_tags(html_message)
 
     send_mail(
         subject,
@@ -65,6 +66,7 @@ HR3D_ENG@lediso.com
         'noreply@hr3d.leidos.com',
         mail_to.list,
         fail_silently=False,
+        html_message=html_message
     )
 
 def new_issue_response_mail(request,issue,issue_response):
@@ -91,18 +93,17 @@ def new_issue_response_mail(request,issue,issue_response):
             mail_to.add(u.email)
 
     subject = f'New Response to Issue ({issue.id}) {issue.short_desc[0:30]}'
-    message = f"""
-A new response to issue {issue.id} ({issue.short_desc}) has been submitted and can be viewed at {request.build_absolute_uri(f"/issues/{issue.id}")}.
 
-Please do not respond to this email. Use the link above to submit a response.
+    html_message=render_to_string('issues/new_response_mail.html', {
+        'submitted_by': issue.submitted_by.username,
+        'issue_id' : issue.id,
+        'author' : f'{issue_response.author.username} ({issue_response.author.email})',
+        'link': request.build_absolute_uri(f"/issues/{issue.id}"),
+        'short_desc' : issue.short_desc,
+        'text' : issue_response.text
+    })
 
-TEXT:
-
-{issue_response.text}
-
-HR3D Engineering Team
-HR3D_ENG@ledios.com   
-    """
+    message=strip_tags(html_message)
 
     send_mail(
         subject,
@@ -110,4 +111,5 @@ HR3D_ENG@ledios.com
         'noreply@hr3d.leidos.com',
         mail_to.list,
         fail_silently=False,
+        html_message=html_message
     )
