@@ -98,6 +98,11 @@ def issues_list(request):
 from django_datatables_view.base_datatable_view import BaseDatatableView
 
 class DTIssueListViewData(BaseDatatableView):
+    """
+    Returns JSON format of data for Datatables
+
+    Column sorting is overridden by what is defined in the Datatable config in the HTML file
+    """
     model = Issue
     columns = ['id','short_desc','category','created_date','submitted_by','assigned_to','completed_date']
     #order_columns = ['id','category','created_date']
@@ -145,6 +150,8 @@ class DTIssueListViewData(BaseDatatableView):
         #     if not submitter:
         #         submitter=self.request.user.id
         #     qs = qs.filter(submitted_by__exact=submitter)
+
+        # NOTE - column ordering is overridden by datatables in HTML file
 
         return qs.filter(q0)
 
@@ -295,7 +302,7 @@ def issue_detail(request, pk):
             #TODO Form Validation Error Page
             return HttpResponseRedirect('/')
     else:
-        issue_responses=issue.response_set.all()
+        issue_responses=issue.response_set.all().order_by('date')
         response_form=ResponseForm(initial={'author': request.user, 'issue':issue.id})
 
     return render(request, 'issues/detail.html', { 'object': issue, 'rid': pk,'issue_responses':issue_responses,'response_form':response_form, 'can_edit':can_edit })
