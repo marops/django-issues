@@ -1,7 +1,13 @@
 {% extends "base.html" %}
 {% load crispy_forms_tags %}
 {% load issues_tags %}
+{% load sekizai_tags %}
+
+
 {% block content %}
+
+{% addtoblock "css" %}
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
 
 <style>
     .card {
@@ -14,6 +20,9 @@
 
     .response-number {}
 </style>
+
+{% endaddtoblock %}
+
 
 <div style="margin: 0 0 ; font-size:11pt">
     <h3>Issue Number {{object.pk}}
@@ -42,8 +51,8 @@
     <!-- Responses -->
     {% for r in issue_responses %}
     <div class="card">
-        <div class="card-header" onclick="$(this).next().toggle()">
-            ( {{r.id}} ) &nbsp;&nbsp;
+        <div class="card-header" title="click to expand/collapse">
+            <i class="far fa-caret-square-right" title="expand/collapse" style="font-size:20px"></i>&nbsp;&nbsp;
             <b>Date:</b> {{r.date}}&nbsp;&nbsp;
             <b>From:</b> {{r.author}}&nbsp;
             <b>Text:</b> {{r.text|truncatechars:55}}
@@ -71,6 +80,7 @@
       </div>
 
         <button type="submit" class="btn btn-primary">Submit</button>
+        <a href="/issues/{{rid}}/"> <button type="button" class="btn btn-primary">Cancel</button></a>
       </form>
 
     </div>
@@ -85,14 +95,21 @@
     </div>
 </div>
 
+
 <script>
     function new_response_form(){
         $("#id_response_form").toggle()
         $("#btn").hide()
     }
 
+   $(".card-header").click(function(){
+        $(this).next().toggle()
+        $(this).find('i').toggleClass('fa-caret-square-right fa-caret-square-down')
+   });
+
     //Tooltip
-    $('.card-header').tooltip({title: "Click on box to expand/contract", placement: "top",  animation: true, delay: {show: 500, hide: 100}});
+    $('.card-header').tooltip({title: "Click on box to expand/contract", placement: "top",  animation: true, delay: {show: 0, hide: 100}});
+
 
 </script>
 
