@@ -84,7 +84,10 @@ def issues_list(request):
         filter="?"+filter
 
     template_name = 'issues/list.html'
-    headers=['Issue#','Short_Desc','Category','Created','Submitted By','Assigned To','Completed']
+    #Differences between Postgres and SQLite on how to order null values and that Datatables does final ordering
+    #we include the header Completed=completed_date and IsCompleted=completes so we can order by completed,created_date
+    #IsCompleted is hidden in the table
+    headers=['Issue#','Short_Desc','Category','Created','Submitted By','Assigned To','Completed','IsCompleted']
     #s='{}{}{}'.format(request.META['HTTP_HOST'],reverse('issues-list-data'),filter,)
     s = '{}{}'.format(reverse('issues:list-data'), filter, )
     extra_context={'headers': headers,'ajax_url':s, 'title':title, 'is_manager':is_manager}
@@ -104,7 +107,7 @@ class DTIssueListViewData(BaseDatatableView):
     Column sorting is overridden by what is defined in the Datatable config in the HTML file
     """
     model = Issue
-    columns = ['id','short_desc','category','created_date','submitted_by','assigned_to','completed_date']
+    columns = ['id','short_desc','category','created_date','submitted_by','assigned_to','completed_date','completed']
     #order_columns = ['id','category','created_date']
     max_display_length = 500
     #template_name = "myapp/datatableview.html"
@@ -152,7 +155,7 @@ class DTIssueListViewData(BaseDatatableView):
         #     qs = qs.filter(submitted_by__exact=submitter)
 
         # NOTE - column ordering is overridden by datatables in HTML file
-
+        #qs.order_by('completed','created_date')
         return qs.filter(q0)
 
     def render_column(self, row, column):
