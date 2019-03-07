@@ -1,0 +1,40 @@
+
+<div class="card">
+    <div class="card-header" >Activity for last {{time_period}}</div>
+    <div class="card-body">
+
+
+
+        <b>New Issues</b> ({{issues.count}})
+        <ul>
+        {% for i in issues %}
+            <li>{{i.id}} - {{i.short_desc}})</li>
+        {% empty %}
+            <li>No new issues during this period</li>
+        {% endfor %}
+
+        </ul>
+
+        <b>Responses</b> ({{responses.count}})
+        <ul>
+        {% for i in responses %}
+            <li><a href="/issues/{{i.issue.id}}"> To Issue {{i.id}} - {{i.text|truncatechars:50}}</a></li>
+        {% empty %}
+            <li>No new responses during this period</li>
+        {% endfor %}
+        </ul>
+
+        <b>Completed</b> ({{completed.count}})
+        <ul>
+        {% for i in completed %}
+            <li>{{i.id}} - {{i.short_desc}} - {{i.completed_date}}</li>
+        {% empty %}
+            <li>No Issues closed during this period</li>
+        {% endfor %}
+        </ul>
+
+
+
+
+    </div>
+</div>
