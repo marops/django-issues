@@ -18,7 +18,7 @@
         <b>Responses</b> ({{responses.count}})
         <ul>
         {% for i in responses %}
-            <li><a href="/issues/{{i.issue.id}}"> To Issue {{i.id}} - {{i.text|truncatechars:50}}</a></li>
+            <li><a href="/issues/{{i.issue.id}}" title="{{i.issue.short_desc}}">To Issue {{i.id}} - {{i.text|truncatechars:50}}</a></li>
         {% empty %}
             <li>No new responses during this period</li>
         {% endfor %}
