@@ -27,7 +27,7 @@
         <b>Completed</b> ({{completed.count}})
         <ul>
         {% for i in completed %}
-            <li>{{i.id}} - {{i.short_desc}} - {{i.completed_date}}</li>
+            <li><a href="{% url 'issues:issue-detail' i.id %}">Issue {{i.id}} - {{i.short_desc}}</a> - {{i.completed_date|date:"m M y" }}</li>
         {% empty %}
             <li>No Issues closed during this period</li>
         {% endfor %}

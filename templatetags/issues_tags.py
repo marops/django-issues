@@ -24,7 +24,7 @@ def activity(days):
         time_period= f'{days} Days'
 
     issues=Issue.objects.filter(created_date__gte=dt).filter(completed=False)
-    responses = Response.objects.filter(date__gt=dt)
+    responses = Response.objects.filter(issue__completed=False).filter(date__gt=dt)
     #completed=Issue.objects.filter(completed_date__gte=dt)
     completed=Issue.objects.filter(completed_date__gte=dt)
 
