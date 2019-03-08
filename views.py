@@ -36,7 +36,7 @@ def test(request):
 def dashboard(request):
     sql="select i.id, i.category_id,c.name,count(*) from issues_issue i left join issues_category c on i.category_id=c.id where not i.completed group by c.name"
 
-    my_issues=Issue.objects.filter(Q(assigned_to=request.user.id)|Q(submitted_by=request.user.id)&Q(completed=False)).count()
+    my_issues=Issue.objects.filter(Q(assigned_to=request.user.id)|Q(submitted_by=request.user.id)).filter(Q(completed=False)).count()
     open_issues=Issue.objects.filter(completed=False).count()
     open_issues_by_category = Issue.objects.filter(completed=False).values('category__name').annotate(total=Count('category'))
     unassigned_issues=Issue.objects.filter(completed=False).filter(assigned_to=None).count()
