@@ -34,7 +34,7 @@ def activity(days):
     for i in issues:
         l=[]
         for r in responses.filter(issue_id=i.id):
-            l.append(r.text)
+            l.append(r.text[:100])
         issue_responses.append({'id':i.id, 'short_desc':i.short_desc,'response__count':i.response__count,'response_list':l})
 
 

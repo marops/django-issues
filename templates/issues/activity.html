@@ -23,7 +23,7 @@
 
             <ol >
             {% for li in i.response_list %}
-                <li><a href="/issues/{{i.id}}">{{li}}</a></li>
+                <li><a href="/issues/{{i.id}}">{{li|truncatechars:90}}</a></li>
             {% endfor %}
             </ol>
         {% empty %}
