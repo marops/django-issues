@@ -5,9 +5,9 @@
 
 
 
-        <b>New Issues</b> ({{issues.count}})
+        <b>New Issues</b> ({{issues_new.count}})
         <ul>
-        {% for i in issues %}
+        {% for i in issues_new %}
             <li>{{i.id}} - {{i.short_desc}})</li>
         {% empty %}
             <li>No new issues during this period</li>
@@ -16,13 +16,21 @@
         </ul>
 
         <b>Responses</b> ({{responses.count}})
+
         <ul>
-        {% for i in responses %}
-            <li><a href="/issues/{{i.issue.id}}" title="{{i.issue.short_desc}}">To Issue {{i.issue.id}} - {{i.text|truncatechars:50}}</a></li>
+        {% for i in issue_responses%}
+            <li style="margin-top:.40em">To Issue {{i.id}} - {{i.short_desc|truncatechars:35}} ({{i.response__count}})</u></li>
+
+            <ol >
+            {% for li in i.response_list %}
+                <li><a href="/issues/{{i.id}}">{{li}}</a></li>
+            {% endfor %}
+            </ol>
         {% empty %}
             <li>No new responses during this period</li>
         {% endfor %}
         </ul>
+
 
         <b>Completed</b> ({{completed.count}})
         <ul>

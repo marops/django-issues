@@ -2,6 +2,7 @@ from django import template
 from issues.models import Issue, Response
 from django.db.models import Q
 from datetime import datetime, timedelta, timezone
+from django.db.models import Count
 
 register = template.Library()
 
@@ -23,9 +24,18 @@ def activity(days):
     else:
         time_period= f'{days} Days'
 
-    issues=Issue.objects.filter(created_date__gte=dt).filter(completed=False)
-    responses = Response.objects.filter(issue__completed=False).filter(date__gt=dt)
+    issues_new=Issue.objects.filter(created_date__gte=dt).filter(completed=False)
+    issues = Issue.objects.filter(completed=False).filter(response__date__gt=dt).annotate(Count('response')).order_by('id')
+    responses = Response.objects.filter(issue__completed=False).filter(date__gt=dt).order_by('issue__id')
     #completed=Issue.objects.filter(completed_date__gte=dt)
     completed=Issue.objects.filter(completed_date__gte=dt)
 
-    return {'time_period':time_period,'issues':issues,'responses': responses, 'completed':completed}
+    issue_responses=[]
+    for i in issues:
+        l=[]
+        for r in responses.filter(issue_id=i.id):
+            l.append(r.text)
+        issue_responses.append({'id':i.id, 'short_desc':i.short_desc,'response__count':i.response__count,'response_list':l})
+
+
+    return {'time_period':time_period,'issues_new':issues_new, 'issues':issues,'responses': responses, 'issue_responses':issue_responses, 'completed':completed}
