@@ -40,6 +40,7 @@ def dashboard(request):
     open_issues=Issue.objects.filter(completed=False).count()
     open_issues_by_category = Issue.objects.filter(completed=False).values('category__name').annotate(total=Count('category'))
     unassigned_issues=Issue.objects.filter(completed=False).filter(assigned_to=None).count()
+    completed_issues = Issue.objects.filter(completed=True).count()
 
     return render(request, 'issues/dashboard.html', {'my_issues':my_issues,'open_issues':open_issues,'unassigned_issues':unassigned_issues})
 
@@ -69,6 +70,10 @@ def issues_list(request):
             filter+=f'completed=0'
             title="Open Issues"
 
+        if f=='completed':
+            filter+=f'completed=1'
+            title="Completed Issues"
+
         #Default for manager is to only show not completed
         # if f=='completed':
         # if len(filter) > 0:
@@ -87,7 +92,7 @@ def issues_list(request):
     #Differences between Postgres and SQLite on how to order null values and that Datatables does final ordering
     #we include the header Completed=completed_date and IsCompleted=completes so we can order by completed,created_date
     #IsCompleted is hidden in the table
-    headers=['Issue#','Short_Desc','Category','Created','Submitted By','Assigned To','Completed','IsCompleted']
+    headers=['Issue#','Short_Desc','Category','Location','Created','Submitted By','Assigned To','Completed','IsCompleted']
     #s='{}{}{}'.format(request.META['HTTP_HOST'],reverse('issues-list-data'),filter,)
     s = '{}{}'.format(reverse('issues:list-data'), filter, )
     extra_context={'headers': headers,'ajax_url':s, 'title':title, 'is_manager':is_manager}
@@ -107,7 +112,7 @@ class DTIssueListViewData(BaseDatatableView):
     Column sorting is overridden by what is defined in the Datatable config in the HTML file
     """
     model = Issue
-    columns = ['id','short_desc','category','created_date','submitted_by','assigned_to','completed_date','completed']
+    columns = ['id','short_desc','category','location','created_date','submitted_by','assigned_to','completed_date','completed']
     #order_columns = ['id','category','created_date']
     max_display_length = 500
     #template_name = "myapp/datatableview.html"
@@ -158,33 +163,43 @@ class DTIssueListViewData(BaseDatatableView):
         #qs.order_by('completed','created_date')
         return qs.filter(q0)
 
-    def render_column(self, row, column):
-        """ Renders a column on a row. column can be given in a module notation eg. document.invoice.type
-        """
-        # try to find rightmost object
-        obj = row
-        parts = column.split('.')
-        for part in parts[:-1]:
-            if obj is None:
-                break
-            obj = getattr(obj, part)
+    def prepare_results(self, qs):
+        # prepare list with output column data
+        # queryset is already paginated here
+        json_data = []
+        url = '/issues'
+        date_format = "%Y-%m-%d"
+        for i in qs:
+            if i.category:
+                category=i.category.name
+            else:
+                category=""
+            if i.submitted_by:
+                submitted_by=i.submitted_by.username
+            else:
+                submitted_by=""
 
-        # try using get_OBJECT_display for choice fields
-        if hasattr(obj, 'get_%s_display' % parts[-1]):
-            value = getattr(obj, 'get_%s_display' % parts[-1])()
-        else:
-            value = getattr(obj, parts[-1], None)
+            if i.assigned_to == None:
+                assigned_to = ""
+            else:
+                assigned_to = i.assigned_to.username
+            if i.location:
+                location = i.location.lid
+            else:
+                location = ""
 
-        if value is None:
-            value = self.none_string
+            created_date = i.created_date.strftime(date_format)
+            if i.completed_date:
+                completed_date = i.completed_date.strftime(date_format)
+            else:
+                completed_date = ""
 
-        if self.escape_values:
-            value = escape(value)
+            json_data.append([
+                f'<a href="{url}/{i.id}">{i.id}</a>', f'<a href="{url}/{i.id}">{i.short_desc}</a>', category,
+                location, created_date, submitted_by, assigned_to, completed_date,i.completed
+            ])
 
-        # if value and hasattr(obj, 'get_absolute_url'):
-        #     return '<a href="%s">%s</a>' % (obj.get_absolute_url(), value)
-        return value
-
+        return json_data
 
 
 

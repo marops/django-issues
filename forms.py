@@ -20,7 +20,7 @@ class IssueNewForm(forms.ModelForm):
     #completed_date=forms.DateTimeField(required=False, widget=forms.TextInput(attrs={'type':'date'}))
     class Meta:
         model=Issue
-        fields=['short_desc','category','desc','submitted_by']
+        fields=['short_desc','category','desc','location','submitted_by']
 
 
 

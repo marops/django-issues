@@ -17,6 +17,7 @@
     <a href="/issues/list/?f=mine" class="btn btn-secondary " role="button" title="All issues submitted or assigned to me">My Issues</a>
     <a href="/issues/list/?f=ua" class="btn btn-secondary " role="button" title="Issues not assigned to anyone">Unassigned Issues</a>
     <a href="/issues/list/?f=oi" class="btn btn-secondary " role="button" title="Any open (not completed) issues">Open Issues</a>
+    <a href="/issues/list/?f=completed" class="btn btn-secondary " role="button" title="Completed issues">Completed</a>
     {% endif %}
 </div>
 
@@ -40,7 +41,13 @@
             "data": {
                 "submitted_by": 1
             },
-            "order": [[ 7, 'asc' ], [ 3, 'asc' ]],
+            "order": [[ 8, 'asc' ], [ 4, 'asc' ]],
+
+            "columnDefs": [
+                { "visible": false, "targets": 8 },
+            ],
+
+            /*
             "columnDefs": [
                 {
                     "render": function ( data, type, row ) {
@@ -68,6 +75,7 @@
                 },
                 { "visible": false, "targets": 7 },
             ],
+            */
             "paging": true,
             "processing": true,
             "serverSide": true
