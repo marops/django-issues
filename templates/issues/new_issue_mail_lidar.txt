@@ -1,0 +1,15 @@
+{% autoescape off %}
+A new issue has been submitted and can be viewed at {{link}}.
+Please do not reply to this email.
+
+SUBMITTED _BY:      {{submitted_by}}
+SHORT_DESCRIPTION:  {{short_desc}}
+
+DESCRIPTION:
+
+    {{desc}}
+
+
+THIS IS A LIDAR ISSUE
+
+{% endautoescape %}
