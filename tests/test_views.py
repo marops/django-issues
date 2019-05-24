@@ -9,6 +9,8 @@ class IssueTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         Category(id=1,name="general").save()
+        Category(id=2,name="LIDAR sensor").save()
+        Category(id=3,name="EO sensor").save()
         u=User.objects.create_superuser(username="todd",email="murphyrt@leidos.com", password="Lidar")
         Group(name="engineers").save()
         g=Group.objects.get(name='engineers')
@@ -71,6 +73,38 @@ class IssueTest(TestCase):
         #print(f'EMAILS: (Issue ID {issue.id}), (Response Count {issue.response_set.all().count()}), (Mail count {len(mc)}), {mc}')
 
 
+    def test_new_issue_lidar(self):
+        """
+        Tests entering a new issue with a category of LIDAR
+
+        Requirements:
+            * restricted to logged in
+            * subset of model fields
+            * custom email for LIDAR
+
+        :return:
+        """
+        c=Category.objects.get(name="LIDAR sensor")
+        u=User.objects.get(username="todd")
+
+        login = self.client.login(username='todd', password='Lidar')
+        data={'short_desc': 'Test1', 'desc': 'Test 1 desc', 'submitted_by': u.id, 'category': c.id}
+        form = IssueForm(data)
+        self.assertTrue(form.is_valid(),form.errors.as_json())
+
+        response = self.client.post('/issues/new/', data)
+        #must be in engineers group or is_staff or is_superuser
+
+        self.assertRegex(response.url,r"^\/issues\/\d*\/")
+
+        issue=Issue.objects.get(short_desc="Test1")
+
+        self.assertEqual(len(mail.outbox), 1)
+        # for m in mail.outbox:
+        #     print(m.__dict__)
+        #     print(f"EMAIL To:{m.to}\n Subject: {m.subject}\n{m.body}")
+
+
     def test_operater_new_issue(self):
 
         c = Category.objects.get(name="general")
@@ -107,7 +141,7 @@ class IssueTest(TestCase):
         #check mail should be addressed ro oscar and ernie
 
 
-    def test_view_issues_list(self):
+    def _test_view_issues_list(self):
         """
         This test the /issues/list view.
 

@@ -43,15 +43,20 @@ def new_issue_mail(request,issue):
     for u in rs:
         mail_to.add(u.email)
 
+    if issue.category_id == 2:  #LIDAR sensor
+        template_base="new_issue_mail_lidar"
+    else:
+        template_base="new_issue_mail"
+
     subject = f'New Issue ({issue.id}) {issue.short_desc[0:50]} '
-    message = render_to_string('issues/new_issue_mail_txt.html', {
+    message = render_to_string(f'issues/{template_base}.txt', {
         'submitted_by': issue.submitted_by.username,
         'link': request.build_absolute_uri(f"/issues/{issue.id}"),
         'short_desc' : issue.short_desc,
         'desc' : issue.desc,
     })
 
-    html_message=render_to_string('issues/new_issue_mail.html', {
+    html_message=render_to_string(f'issues/{template_base}.html', {
         'submitted_by': issue.submitted_by.username,
         'link': request.build_absolute_uri(f"/issues/{issue.id}"),
         'short_desc' : issue.short_desc,
