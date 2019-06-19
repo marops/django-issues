@@ -38,8 +38,8 @@
     <b>Due</b>: {{object.due_date | date:"Y-m-d"}}
     <b>Completed</b>: {{object.completed_date | date:"Y-m-d H:i:s e"}}
     <br/>
-    <b>Submitted by</b>: {{object.submitted_by}}<span style="width:2em">&nbsp</span>
-    <b>Assigned to</b>: {{object.assigned_to}}
+    <b>Submitted by</b>: {{object.submitted_by.get_full_name}}<span style="width:2em">&nbsp</span>
+    <b>Assigned to</b>: {{object.assigned_to.get_full_name}}
     <br/>
 
     <b>Desc</b>:
