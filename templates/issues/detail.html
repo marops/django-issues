@@ -19,6 +19,8 @@
     }
 
     .response-number {}
+
+    .div-border {padding:1em;border:1px solid silver;margin-left:1em}
 </style>
 
 {% endaddtoblock %}
@@ -42,9 +44,17 @@
 
     <b>Desc</b>:
     <br/>
-    <div style="margin-left:1em">
+    <div class="div-border">
         {{ object.desc | linebreaks }}
     </div>
+
+    {% if object.completed %}
+    <b>Resolution:</b><br/>
+    <div class="div-border">
+    {{object.resolution | linebreaks}}
+    </div>
+
+    {% endif %}
 
     <hr/>
     <h4>Responses</h4>
@@ -87,13 +97,15 @@
 
     <div>
 
-    <p><button type="button" id="btn" class="btn btn-primary"  onclick="new_response_form();">New Response</button></p>
-
+        {% if not object.completed %}
+        <p><button type="button" id="btn" class="btn btn-primary"  onclick="new_response_form();">New Response</button></p>
+        {% endif %}
 
         <hr>
         <p style="font-size:0.8rem">Last Modified {{object.modified_date | date:"Y-m-d H:i:s e"}}</p>
     </div>
 </div>
+
 
 
 <script>

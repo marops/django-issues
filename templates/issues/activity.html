@@ -8,7 +8,7 @@
         <b>New Issues</b> ({{issues_new.count}})
         <ul>
         {% for i in issues_new %}
-            <li>{{i.id}} - {{i.short_desc}})</li>
+            <li>Issue {{i.id}} - <a href="{% url 'issues:issue-detail' i.id %}">{{i.short_desc}})</a></li>
         {% empty %}
             <li>No new issues during this period</li>
         {% endfor %}
