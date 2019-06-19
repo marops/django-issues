@@ -16,7 +16,7 @@ class IssueForm(forms.ModelForm):
     #due_date=forms.DateField(required=False,widget=forms.TextInput(attrs={'type':'date'}))
     #completed_date=forms.DateTimeField(required=False, widget=forms.TextInput(attrs={'type':'date'}))
     submitted_by = UserModelChoiceField(User.objects.all().order_by('last_name'))
-    assigned_to = UserModelChoiceField(User.objects.all().order_by('last_name'))
+    assigned_to = UserModelChoiceField(User.objects.all().order_by('last_name'), required=False)
 
     class Meta:
         model=Issue
