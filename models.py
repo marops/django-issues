@@ -40,7 +40,7 @@ class Issue(models.Model):
     short_desc = models.CharField(max_length=255)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True)
     desc = models.TextField(blank=True, null=True)
-    location = models.ForeignKey(Location,on_delete=models.CASCADE, null=True, blank=True, to_field='lid', db_constraint=False)
+    location = models.ForeignKey(Location,on_delete=models.PROTECT, null=True, to_field='lid', db_constraint=False)
     submitted_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     #created_by = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='todo_created_by', on_delete=models.CASCADE)
     assigned_to = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, related_name='issues_assigned_to', on_delete=models.CASCADE)
