@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth.models import User, Group
-from issues.models import Issue, Category, Response
+from issues.models import Issue, Category, Response, Location
 from issues.forms import IssueForm, ResponseForm
 from django.core import mail
 
@@ -23,6 +23,9 @@ class IssueTest(TestCase):
         #add another user into regular account. ie no group
         u=User.objects.create_user(username="oscar",email="oscar.@hr3d.leidos.com", password="Lidar")
 
+        #Add a location
+        Location(lid="Other",name="Other").save()
+
 
     def setUp(self):
         #login = self.client.login(username='todd', password='Lidar')
@@ -40,9 +43,10 @@ class IssueTest(TestCase):
         """
         c=Category.objects.get(name="general")
         u=User.objects.get(username="todd")
+        loc=Location.objects.get(lid="Other")
 
         login = self.client.login(username='todd', password='Lidar')
-        data={'short_desc': 'Test1', 'desc': 'Test 1 desc', 'submitted_by': u.id, 'category': c.id}
+        data={'short_desc': 'Test1', 'desc': 'Test 1 desc', 'submitted_by': u.id, 'category': c.id, 'location':loc.lid}
         form = IssueForm(data)
         self.assertTrue(form.is_valid(),form.errors.as_json())
 
@@ -86,9 +90,10 @@ class IssueTest(TestCase):
         """
         c=Category.objects.get(name="LIDAR sensor")
         u=User.objects.get(username="todd")
+        loc=Location.objects.get(lid="Other")
 
         login = self.client.login(username='todd', password='Lidar')
-        data={'short_desc': 'Test1', 'desc': 'Test 1 desc', 'submitted_by': u.id, 'category': c.id}
+        data={'short_desc': 'Test1', 'desc': 'Test 1 desc', 'submitted_by': u.id, 'category': c.id,'location':loc.lid}
         form = IssueForm(data)
         self.assertTrue(form.is_valid(),form.errors.as_json())
 
@@ -109,12 +114,13 @@ class IssueTest(TestCase):
 
         c = Category.objects.get(name="general")
         u = User.objects.get(username="oscar")
+        loc=Location.objects.get(lid="Other")
 
         #login as oscar
         login = self.client.login(username='oscar', password='Lidar')
 
         #new issue
-        data = {'short_desc': 'Test1', 'desc': 'Test 1 desc', 'submitted_by': u.id, 'category': c.id}
+        data = {'short_desc': 'Test1', 'desc': 'Test 1 desc', 'submitted_by': u.id, 'category': c.id, 'location':loc.lid}
         form = IssueForm(data)
         self.assertTrue(form.is_valid(),form.errors.as_json())
 

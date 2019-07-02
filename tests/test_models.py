@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django.contrib.auth.models import User, Group
-from issues.models import Issue, Category, Response, Document
+from issues.models import Issue, Category, Response, Document, Location
 from django.conf import settings
 from issues.forms import IssueForm
 
@@ -25,6 +25,9 @@ class IssueTestClass(TestCase):
         #if using rest it will add the following to get_absolute_url, otherwise set to blank
         cls.rest="data/issues/"
 
+        #Add a location
+        Location(lid="Other",name="Other").save()
+
     def setUp(self):
         #print("setUp: Run once for every test method to setup clean data.")
         login = self.client.login(username='todd', password='Lidar')
@@ -38,9 +41,10 @@ class IssueTestClass(TestCase):
         """
         u=User.objects.get(username="ernie")
         c=Category.objects.get(name="general")
+        loc=Location.objects.get(lid="Other")
 
         #Create an issue
-        data={'short_desc': 'Test1', 'desc': 'Test 1 desc', 'submitted_by': u.id, 'category': c.id}
+        data={'short_desc': 'Test1', 'desc': 'Test 1 desc', 'submitted_by': u.id, 'category': c.id, 'location':loc.lid}
         form = IssueForm(data)
         self.assertTrue(form.is_valid(),form.errors.as_json())
         form.save()
