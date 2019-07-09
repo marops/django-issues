@@ -126,3 +126,59 @@ def new_issue_response_mail(request,issue,issue_response):
         fail_silently=False,
         html_message=html_message
     )
+
+
+def updated_issue_mail(request,issue,changed_data):
+    """
+    Sends out mail when a issue is updated. Currently only for when marked completed.
+
+    Sent to user who submitted (submitted_by)
+
+    :param request: the view request. Used to get URI
+    :param issue: the issue
+    :param changed_data: list of fields that were changed
+    :return:
+    """
+
+    mail_to = MailList()
+    mail_to.add(issue.submitted_by.email)
+
+    template_base="updated_issue_mail"
+
+    subject = f'Completed Issue ({issue.id}) {issue.short_desc[0:50]} '
+
+    if issue.location:
+        location=issue.location.name
+    else:
+        location=""
+
+    message = render_to_string(f'issues/{template_base}.txt', {
+        'submitted_by': issue.submitted_by.username,
+        'location': location,
+        'link': request.build_absolute_uri(f"/issues/{issue.id}"),
+        'short_desc' : issue.short_desc,
+        'desc' : issue.desc,
+        'resolution': issue.resolution,
+        'completed_date':issue.completed_date,
+    })
+
+    html_message=render_to_string(f'issues/{template_base}.html', {
+        'submitted_by': issue.submitted_by.username,
+        'location': location,
+        'link': request.build_absolute_uri(f"/issues/{issue.id}"),
+        'short_desc' : issue.short_desc,
+        'desc' : issue.desc,
+        'resolution': issue.resolution,
+        'completed_date': issue.completed_date,
+    })
+
+    #message=strip_tags(html_message)
+
+    send_mail(
+        subject,
+        message,
+        'noreply@hr3d.leidos.com',
+        mail_to.list,
+        fail_silently=False,
+        html_message=html_message
+    )

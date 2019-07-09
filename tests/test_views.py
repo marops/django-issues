@@ -248,3 +248,43 @@ class IssueTest(TestCase):
         self.assertTemplateUsed(response, 'issues/dashboard.html')
 
 
+    def test_update_issue_completed(self):
+        """
+        Tests entering a new issue
+
+        Requirements:
+            * restricted to logged in
+            * subset of model fields
+
+        :return:
+        """
+        c=Category.objects.get(name="general")
+        u=User.objects.get(username="todd")
+        loc=Location.objects.get(lid="Other")
+
+        login = self.client.login(username='todd', password='Lidar')
+        data={'short_desc': 'Test1', 'desc': 'Test 1 desc', 'submitted_by': u.id, 'category': c.id, 'location':loc.lid}
+        form = IssueForm(data)
+        self.assertTrue(form.is_valid(),form.errors.as_json())
+
+        response = self.client.post('/issues/new/', data)
+        #must be in engineers group or is_staff or is_superuser
+
+        self.assertRegex(response.url,r"^\/issues\/\d*\/")
+
+        issue=Issue.objects.get(short_desc="Test1")
+
+        self.assertEqual(len(mail.outbox), 1)
+
+        #mark record completed
+        data = {'short_desc': 'Test1', 'desc': 'Test 1 desc', 'submitted_by': u.id, 'category': c.id,'location': loc.lid,'completed':True}
+        response = self.client.post(f'/issues/{issue.id}/edit/', data)
+
+        self.assertEqual(len(mail.outbox),2)
+
+        mc=[]
+        for m in mail.outbox:
+            mc.append(f'{m.to}, {m.subject}')
+
+        # print(f'EMAILS: {mc[1]}')
+

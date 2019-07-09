@@ -1,0 +1,20 @@
+{% autoescape off %}
+Your issue has been marked completed and is closed. It can be viewed at {{link}}.
+
+SUBMITTED_BY:      {{submitted_by}}
+LOCATION:           {{location}}
+SHORT_DESCRIPTION:  {{short_desc}}
+
+DESCRIPTION:
+
+    {{desc}}
+
+RESOLUTION
+
+    {{resoultion}}
+
+
+COMPLETED: {{completed_date}} UTC
+
+
+{% endautoescape %}
