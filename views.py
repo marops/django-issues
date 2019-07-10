@@ -208,7 +208,7 @@ class DTIssueListViewData(BaseDatatableView):
 #     headers=['Issue#','Short_Desc','Category','Created','Submitted By','Assigned To','Completed']
 #     extra_context={'headers': headers,'ajax_url':'/issues/list3/data'}
 
-from .mail import new_issue_mail, new_issue_response_mail
+from .mail import new_issue_mail, new_issue_response_mail, updated_issue_mail
 
 @login_required
 def issue_new(request):
@@ -224,6 +224,7 @@ def issue_new(request):
 
             # mail to submitted_by and engineers
             new_issue_mail(request,rc)
+
             # redirect to a new URL:
             return HttpResponseRedirect(reverse('issues:issue-detail',args=[rc.pk]))
     else:
@@ -268,8 +269,13 @@ def issue_view(request,pk,action=None):
 
         # check whether it's valid:
         if form.is_valid():
+
             # process the data in form.cleaned_data as required
             rc=form.save()
+
+            #if completed send notification email
+            if ('completed' in form.changed_data) and (rc.completed):
+                updated_issue_mail(request, rc, form.changed_data)
 
             # redirect to a new URL:
             return HttpResponseRedirect(reverse('issues:issue-detail', args=[rc.pk]))
