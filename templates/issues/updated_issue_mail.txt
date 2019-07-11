@@ -11,7 +11,7 @@ DESCRIPTION:
 
 RESOLUTION
 
-    {{resoultion}}
+    {{resolution}}
 
 
 COMPLETED: {{completed_date}} UTC

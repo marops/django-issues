@@ -64,7 +64,7 @@
     <div class="card">
         <div class="card-header" title="click to expand/collapse">
             <i class="far fa-caret-square-right" title="expand/collapse" style="font-size:20px"></i>&nbsp;&nbsp;
-            <b>Date:</b> {{r.date}}&nbsp;&nbsp;
+            <b>Date:</b> {{r.date | date:"Y-m-d H:i:s (e) "}}
             <b>From:</b> {{r.author}}&nbsp;
             <b>Text:</b> {{r.text|truncatechars:55}}
         </div>
