@@ -74,6 +74,9 @@ def issues_list(request):
             filter+=f'completed=1'
             title="Completed Issues"
 
+        if f=='all':
+            title="All Issues"
+
         #Default for manager is to only show not completed
         # if f=='completed':
         # if len(filter) > 0:
@@ -128,7 +131,8 @@ class DTIssueListViewData(BaseDatatableView):
         # simple example:
         search = self.request.GET.get(u'search[value]', None)
         if search:
-            qs = qs.filter(short_desc__istartswith=search)
+            #qs = qs.filter(short_desc__istartswith=search)
+            qs = qs.filter(Q(short_desc__icontains=search)|Q(desc__icontains=search))
 
         q0=Q()
 

@@ -15,9 +15,10 @@
     <a href="/issues/new" class="btn btn-primary" role="button" title="Creates a New Issue">New Issue</a>
     {% if is_manager %}
     <a href="/issues/list/?f=mine" class="btn btn-secondary " role="button" title="All issues submitted or assigned to me">My Issues</a>
-    <a href="/issues/list/?f=ua" class="btn btn-secondary " role="button" title="Issues not assigned to anyone">Unassigned Issues</a>
-    <a href="/issues/list/?f=oi" class="btn btn-secondary " role="button" title="Any open (not completed) issues">Open Issues</a>
+    <a href="/issues/list/?f=ua" class="btn btn-secondary " role="button" title="Issues not assigned to anyone">Unassigned</a>
+    <a href="/issues/list/?f=oi" class="btn btn-secondary " role="button" title="Any open (not completed) issues">Open</a>
     <a href="/issues/list/?f=completed" class="btn btn-secondary " role="button" title="Completed issues">Completed</a>
+    <a href="/issues/list/?f=all" class="btn btn-secondary " role="button" title="All issues">All</a>
     {% endif %}
 </div>
 
@@ -82,6 +83,8 @@
         })
 
         $('.btn').tooltip({placement: "top",  animation: true, delay: {show: 100, hide: 100}});
+
+        $("#example_filter label input").attr("title","Case Insensitive search of Short Desc and Description").tooltip();
 
 </script>
 {% endblock %}
