@@ -5,6 +5,7 @@ Please do not reply to this email.
 SUBMITTED_BY:      {{submitted_by}}
 LOCATION:           {{location}}
 SHORT_DESCRIPTION:  {{short_desc}}
+CATEGORY:           {{category}}
 
 DESCRIPTION:
 

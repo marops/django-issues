@@ -60,6 +60,7 @@ def new_issue_mail(request,issue):
         'location': location,
         'link': request.build_absolute_uri(f"/issues/{issue.id}"),
         'short_desc' : issue.short_desc,
+        'category' : issue.category,
         'desc' : issue.desc,
     })
 
@@ -68,6 +69,7 @@ def new_issue_mail(request,issue):
         'location': location,
         'link': request.build_absolute_uri(f"/issues/{issue.id}"),
         'short_desc' : issue.short_desc,
+        'category': issue.category,
         'desc' : issue.desc,
     })
 
@@ -113,6 +115,7 @@ def new_issue_response_mail(request,issue,issue_response):
         'author' : f'{issue_response.author.username} ({issue_response.author.email})',
         'link': request.build_absolute_uri(f"/issues/{issue.id}"),
         'short_desc' : issue.short_desc,
+        'category': issue.category,
         'text' : issue_response.text
     })
 

@@ -216,6 +216,12 @@ from .mail import new_issue_mail, new_issue_response_mail, updated_issue_mail
 
 @login_required
 def issue_new(request):
+    """
+    Create a new Issue
+
+    :param request:
+    :return: renders data with template
+    """
 
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
