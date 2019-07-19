@@ -24,11 +24,11 @@ def activity(days):
     else:
         time_period= f'{days} Days'
 
-    issues_new=Issue.objects.filter(created_date__gte=dt).filter(completed=False)
+    issues_new=Issue.objects.filter(created_date__gte=dt).filter(completed=False).order_by('id')
     issues = Issue.objects.filter(completed=False).filter(response__date__gt=dt).annotate(Count('response')).order_by('id')
     responses = Response.objects.filter(issue__completed=False).filter(date__gt=dt).order_by('issue__id')
     #completed=Issue.objects.filter(completed_date__gte=dt)
-    completed=Issue.objects.filter(completed_date__gte=dt)
+    completed=Issue.objects.filter(completed_date__gte=dt).order_by('id')
 
     issue_responses=[]
     for i in issues:
