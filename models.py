@@ -69,9 +69,9 @@ class Issue(models.Model):
     def save(self, **kwargs):
         # If Task is being marked complete, set the completed_date
         if self.completed:
-            self.completed_date = datetime.datetime.now()
+            self.completed_date = timezone.now()
 
-        self.modified_date = datetime.datetime.now(pytz.utc)
+        self.modified_date = timezone.now()
         super(Issue, self).save()
 
     def get_absolute_url(self):
