@@ -84,6 +84,7 @@
   $('<div id="jsoneditor"></div>').insertAfter("#id_metadata")
 
   var textarea = document.getElementById('id_metadata');
+  var metadata_root_name="metadata"
 
   var options = {
     mode: 'tree',
@@ -92,7 +93,7 @@
       alert(err.toString());
     },
     onModeChange: function(newMode, oldMode) {
-      editor.setName("Sensor")
+      editor.setName(metadata_root_name)
     },
     onChange: function() {
       var json = editor.get();
@@ -101,9 +102,10 @@
     }
   };
 
+
   textarea.style.display="none"
   var editor = new JSONEditor( document.getElementById('jsoneditor'), options, JSON.parse(textarea.value));
-  editor.setName("Sensor")
+  editor.setName(metadata_root_name)
 
 
 </script>

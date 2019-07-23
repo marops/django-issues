@@ -3,7 +3,6 @@ from .models import Document, Response
 from django import forms
 from django.conf import settings
 from django.db import models
-from testapp.widgets import *
 
 
 ### ModelForms
