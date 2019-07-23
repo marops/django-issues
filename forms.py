@@ -3,6 +3,8 @@ from .models import Document, Response
 from django import forms
 from django.conf import settings
 from django.db import models
+from testapp.widgets import *
+
 
 ### ModelForms
 from .models import Issue
@@ -22,6 +24,12 @@ class IssueForm(forms.ModelForm):
         model=Issue
         #fields=['headline','pub_date','content','reporter']
         exclude=['modified_date']
+
+        widgets = {
+            'metadata': forms.Textarea(attrs={'cols': '40', 'rows': '2'})
+            #'metadata': JSONEditorWidget(attrs={'cols': '40', 'rows': '2'}, height="100%")
+        }
+
 
 
 class IssueNewForm(forms.ModelForm):

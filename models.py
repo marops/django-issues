@@ -8,6 +8,7 @@ from django.contrib.auth.models import Group
 from django.urls import reverse
 from django.utils import timezone
 import pytz
+from django.contrib.postgres.fields import JSONField
 
 
 # Create your models here.
@@ -41,6 +42,7 @@ class Issue(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True)
     desc = models.TextField(blank=True, null=True)
     location = models.ForeignKey(Location,on_delete=models.PROTECT, null=True, to_field='lid', db_constraint=False)
+    metadata = JSONField(blank=True, default=dict)
     submitted_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     #created_by = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='todo_created_by', on_delete=models.CASCADE)
     assigned_to = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, related_name='issues_assigned_to', on_delete=models.CASCADE)
@@ -52,6 +54,7 @@ class Issue(models.Model):
     priority = models.PositiveIntegerField(default=1,blank=True, null=True)
     resolution = models.TextField(blank=True, null=True)
     tags = models.CharField(max_length=255,blank=True, null=True)
+
 
     # Has due date for an instance of this object passed?
     def overdue_status(self):

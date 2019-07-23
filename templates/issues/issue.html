@@ -1,6 +1,10 @@
 {% extends "base.html" %}
 {% load crispy_forms_tags %}
 {% block content %}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsoneditor/6.1.0/jsoneditor.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsoneditor/6.1.0/jsoneditor.min.js"></script>
+
 <style>
     #id_category, #id_submitted_by, #id_location {width:12em}
     #id_created_date, #id_due_date, #id_completed_date {width:14em;}
@@ -22,6 +26,7 @@
 <h2>Issue Number {{rid}}</h2>
 {% else %}
 <h2>New Issue</h2>
+{{form.media}}
 {% endif %}
 <form action="/issues/{{rid}}/edit/" method="post">
     {% csrf_token %}
@@ -73,6 +78,32 @@
         $("#div_id_resolution").toggle()
         $("#div_id_tags").hide()
     }
+
+    //Metadata
+  // create the editor
+  $('<div id="jsoneditor"></div>').insertAfter("#id_metadata")
+
+  var textarea = document.getElementById('id_metadata');
+
+  var options = {
+    mode: 'tree',
+    modes: ['code', 'form', 'text', 'tree', 'view'], // allowed modes
+    onError: function(err) {
+      alert(err.toString());
+    },
+    onModeChange: function(newMode, oldMode) {
+      editor.setName("Sensor")
+    },
+    onChange: function() {
+      var json = editor.get();
+      //alert(JSON.stringify(json,null,2))
+      textarea.value=JSON.stringify(json)
+    }
+  };
+
+  textarea.style.display="none"
+  var editor = new JSONEditor( document.getElementById('jsoneditor'), options, JSON.parse(textarea.value));
+  editor.setName("Sensor")
 
 
 </script>
