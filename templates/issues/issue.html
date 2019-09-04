@@ -5,6 +5,8 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsoneditor/6.1.0/jsoneditor.min.css" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jsoneditor/6.1.0/jsoneditor.min.js"></script>
 
+{{form.media.css}}
+
 <style>
     #id_category, #id_submitted_by, #id_location {width:12em}
     #id_created_date, #id_due_date, #id_completed_date {width:14em;}
@@ -26,7 +28,6 @@
 <h2>Issue Number {{rid}}</h2>
 {% else %}
 <h2>New Issue</h2>
-{{form.media}}
 {% endif %}
 <form action="/issues/{{rid}}/edit/" method="post">
     {% csrf_token %}
@@ -107,7 +108,20 @@
   var editor = new JSONEditor( document.getElementById('jsoneditor'), options, JSON.parse(textarea.value));
   editor.setName(metadata_root_name)
 
+   // Select2 Tags
+   $("#cms-top").hide()
+   $("#div_id_tags").hide()
+
+   //=== tag_all data for Select2 ===
+   data=[
+        {% for t in tags_all %}
+        { id:'{{t.name}}',text:'{{t.name}}' },
+        {% endfor %}
+   ];
+
 
 </script>
+
+{{form.media.js}}
 
 {% endblock %}

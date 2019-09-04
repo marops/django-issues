@@ -9,7 +9,7 @@ from django.urls import reverse
 from django.utils import timezone
 import pytz
 from django.contrib.postgres.fields import JSONField
-
+from taggit.managers import TaggableManager
 
 # Create your models here.
 
@@ -53,7 +53,7 @@ class Issue(models.Model):
     modified_date = models.DateTimeField(blank=True, null=True)
     priority = models.PositiveIntegerField(default=1,blank=True, null=True)
     resolution = models.TextField(blank=True, null=True)
-    tags = models.CharField(max_length=255,blank=True, null=True)
+    tags = TaggableManager(blank=True)
 
 
     # Has due date for an instance of this object passed?

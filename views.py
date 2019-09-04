@@ -12,6 +12,7 @@ from .decorators import group_required
 from django.contrib.auth.models import User, Group
 from django.utils.html import escape
 from django.db.models import Q
+from taggit.models import Tag
 
 @login_required
 def index(request):
@@ -297,8 +298,9 @@ def issue_view(request,pk,action=None):
             return render(request, 'ticket/confirm_delete.html', {'object': instance,'success_url':success_url})
 
         form = IssueForm(instance=instance)
+        tags_all=Tag.objects.all().order_by('name')
 
-    return render(request, 'issues/issue.html', {'form': form, 'rid':pk, 'action':action, 'is_engineer':is_engineer})
+    return render(request, 'issues/issue.html', {'form': form, 'rid':pk, 'tags_all': tags_all, 'action':action, 'is_engineer':is_engineer})
 
 @login_required
 def issue_detail(request, pk):
