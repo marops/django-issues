@@ -3,6 +3,7 @@ from issues.models import Issue, Response
 from django.db.models import Q
 from datetime import datetime, timedelta, timezone
 from django.db.models import Count
+from django.db import connection
 
 register = template.Library()
 
@@ -39,3 +40,21 @@ def activity(days):
 
 
     return {'time_period':time_period,'issues_new':issues_new, 'issues':issues,'responses': responses, 'issue_responses':issue_responses, 'completed':completed}
+
+
+@register.inclusion_tag('issues/stats.html')
+def stats():
+    sql90 = "select count(*) as c from issues_issue where not completed and DATE_PART('day',now()-created_date)>90;"
+    sql9030 = "select count(*) from issues_issue where not completed and DATE_PART('day',now()-created_date)<=90 and DATE_PART('day',now()-created_date)>30;"
+    sql30 = "select count(*) as c from issues_issue where not completed and DATE_PART('day',now()-created_date)<=30;"
+
+    stats = {}
+    cur = connection.cursor()
+    cur.execute(sql90)
+    stats['gt90'] = cur.fetchone()[0]
+    cur.execute(sql9030)
+    stats['lte90_gt30'] = cur.fetchone()[0]
+    cur.execute(sql30)
+    stats['lte30'] = cur.fetchone()[0]
+    stats['total_open'] = stats['gt90']+stats['lte90_gt30']+stats['lte30']
+    return {'stats': stats}

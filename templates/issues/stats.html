@@ -1,0 +1,38 @@
+
+<div class="card">
+    <div class="card-header" >Current Situation</div>
+    <div class="card-body">
+
+        <table id="stats_table" style="max-wdith:200px" class="stats">
+            <thead>
+                <tr>
+                    <th>Days Issues Open</th>
+                    <th style="text-align:center">Count</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="text-align:right">Greater than 90</td>
+                    <td style="text-align:center">{{stats.gt90}}</td>
+                </tr>
+
+                <tr>
+                    <td style="text-align:right">30 - 90</td>
+                    <td style="text-align:center">{{stats.lte90_gt30}}</td>
+                </tr>
+
+                <tr>
+                    <td style="text-align:right">Less than 30</td>
+                    <td style="text-align:center">{{stats.lte30}}</td>
+                </tr>
+
+                <tr>
+                    <td style="text-align:right"><b>Total</b></td>
+                    <td style="text-align:center"><b>{{stats.total_open}}</b></td>
+                </tr>
+
+            </tbody>
+        </table>
+
+    </div>
+</div>

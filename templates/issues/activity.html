@@ -15,6 +15,15 @@
 
         </ul>
 
+        <b>Completed</b> ({{completed.count}})
+        <ul>
+        {% for i in completed %}
+            <li><a href="{% url 'issues:issue-detail' i.id %}">Issue {{i.id}} - {{i.short_desc}}</a> - {{i.completed_date|date:"d M y" }}</li>
+        {% empty %}
+            <li>No Issues closed during this period</li>
+        {% endfor %}
+        </ul>
+
         <b>Responses</b> ({{responses.count}})
 
         <ul>
@@ -30,19 +39,6 @@
             <li>No new responses during this period</li>
         {% endfor %}
         </ul>
-
-
-        <b>Completed</b> ({{completed.count}})
-        <ul>
-        {% for i in completed %}
-            <li><a href="{% url 'issues:issue-detail' i.id %}">Issue {{i.id}} - {{i.short_desc}}</a> - {{i.completed_date|date:"d M y" }}</li>
-        {% empty %}
-            <li>No Issues closed during this period</li>
-        {% endfor %}
-        </ul>
-
-
-
 
     </div>
 </div>

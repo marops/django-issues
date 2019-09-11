@@ -13,6 +13,7 @@ from django.contrib.auth.models import User, Group
 from django.utils.html import escape
 from django.db.models import Q
 from taggit.models import Tag
+from django.db import connection
 
 @login_required
 def index(request):
