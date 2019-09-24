@@ -25,6 +25,7 @@ class IssuesMenu(CMSAttachMenu):
         nodes.append(NavigationNode(title='My Issues', url='/issues/list', id=1))
         nodes.append(NavigationNode(title='New Issue', url='/issues/new', id=2))
         nodes.append(NavigationNode(title='Dashboard', url='/issues/dashboard', id=3))
+        nodes.append(NavigationNode(title='By Location', url='/issues/location', id=3))
 
         # n = NavigationNode(_('sample settings page'), "/bye/", 2)
         # nodes.append(n)

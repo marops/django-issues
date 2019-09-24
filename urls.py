@@ -27,6 +27,7 @@ urlpatterns = [
     path('<int:pk>/', views.issue_detail, name='issue-detail'),
     path('<int:pk>/<str:action>/', views.issue_view, name='issues-action'),
     path('new/',views.issue_new, name='issue-new'),
+    path('location/', views.LocationView.as_view(), name='issues-location'),
     path('test/',views.test, name='issues-test'),
     path('rest/', views.rest, name='rest'),
     #path('data/', include(router.urls)),

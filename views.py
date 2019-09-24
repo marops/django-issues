@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
-from .models import Issue, Response, Category, Document
+from .models import Issue, Response, Category, Document, Location
 from django.utils import timezone
 from .forms import IssueForm, ResponseForm, IssueNewForm
 from django.core.files.storage import default_storage
@@ -14,6 +14,10 @@ from django.utils.html import escape
 from django.db.models import Q
 from taggit.models import Tag
 from django.db import connection
+from django.views.generic.base import TemplateView
+import json
+from django.utils.decorators import method_decorator
+
 
 @login_required
 def index(request):
@@ -55,40 +59,30 @@ def issues_list(request):
 
     filter = ""
 
-    if is_manager:
+    if not f:
+        f='mine'
 
-        if not f:
-            f='mine'
+    if f=='mine':   #show issues assigned to user
+        filter+=f'assigned_to={request.user.id}&submitted_by={request.user.id}'
+        title="My Issues"
 
-        if f=='mine':   #show issues assigned to user
-            filter+=f'assigned_to={request.user.id}&submitted_by={request.user.id}'
-            title="My Issues"
-
-        if f=='ua':
+    if f=='ua':
+        if(is_manager):
             filter+=f'assigned_to=0&completed=0'
             title="Unassigned Issues"
+        else:
+            f='all'
 
-        if f=='oi':
-            filter+=f'completed=0'
-            title="Open Issues"
+    if f=='oi':
+        filter+=f'completed=0'
+        title="Open Issues"
 
-        if f=='completed':
-            filter+=f'completed=1'
-            title="Completed Issues"
+    if f=='completed':
+        filter+=f'completed=1'
+        title="Completed Issues"
 
-        if f=='all':
-            title="All Issues"
-
-        #Default for manager is to only show not completed
-        # if f=='completed':
-        # if len(filter) > 0:
-        #     filter="&"
-        # #filter+="{}={}".format('completed', 0)
-        #title="Completed Issues"
-
-    else:
-        filter += f"submitted_by={request.user.id}"
-        title = "My Issues"
+    if f=='all':
+        title="All Issues"
 
     if len(filter)>0:
         filter="?"+filter
@@ -343,6 +337,96 @@ def issue_detail(request, pk):
         response_form=ResponseForm(initial={'author': request.user, 'issue':issue.id})
 
     return render(request, 'issues/detail.html', { 'object': issue, 'rid': pk,'issue_responses':issue_responses,'response_form':response_form, 'can_edit':can_edit })
+
+
+@method_decorator(login_required, name='dispatch')
+class LocationView(TemplateView):
+    """
+    View of Issues by Location
+    """
+
+    template_name = "issues/location.html"
+
+    def get_context_data(self, **kwargs):
+        """
+        Set context.
+        If GET location then select that location else
+        checks for a session['location'] else set location="".
+
+        Whatever location is select will be saved in a session variable.
+
+        :param kwargs:
+        :return: context
+        """
+        context = super().get_context_data(**kwargs)
+        #context['data'] = self.getJson()
+        if (self.request.GET.get('location',False)):
+            cur_location=self.request.GET.get('location','')
+        else:
+            cur_location=self.request.session._session.get('location','')
+
+        self.request.session['location']=cur_location
+
+        context['cur_location']=cur_location
+        context['locations'] = Location.objects.all().order_by('name')
+        context['issues'] = Issue.objects.all().filter(completed=False).filter(location_id=cur_location).order_by('location').order_by('id')
+        context['title'] = f"Issues by Locations"
+        return context
+
+    # def render_to_response(self, context, **response_kwargs):
+    #     response = super(TemplateView, self).render_to_response(context, **response_kwargs)
+    #     #response.set_cookie('location', 'Aeroptic')
+    #     return response
+
+    def getJson(self):
+        """
+        Creates data for Issues by location
+
+        :return:
+        """
+
+        locations = Location.objects.all().order_by('name')
+        o=[]
+        for i in locations:
+            x = {"id": i.lid, "text": i.name, "li_attr":{"id2":''},"a_attr":{"href":"#"},"icon":"fas fa-map-marker-alt"}
+
+            c=[]
+            issues=Issue.objects.filter(location=i.lid).filter(completed=False).order_by('id')
+            js_str=self.getIssueJson(issues)
+
+            x['children'] = json.loads(js_str)
+
+            o.append(x)
+
+        js_str=json.dumps(o)
+        return js_str
+
+    def getIssueJson(self, issues):
+        """
+        Gets Issues as JSON
+
+        :return: JSON string
+        """
+        maxWidth=50
+        o=[]
+        for i in issues:
+            if (len(i.short_desc) > maxWidth):
+                txt=i.short_desc[:maxWidth-3]+"..."
+            else:
+                txt=i.short_desc
+
+            x = {"id": i.id, "text": f"{txt} ({i.id})", "li_attr":{"title":i.short_desc},"a_attr":{"href":"/issues/"+str(i.id)}}
+
+            # c=[]
+            # issues=Issue.objects.filter(location=i.lid)
+            # js_str=self.getIssueJson(issues)
+            #
+            # x['children'] = json.loads(js_str)
+
+            o.append(x)
+
+        js_str=json.dumps(o)
+        return js_str
 
 
 
