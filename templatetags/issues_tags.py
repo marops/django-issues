@@ -7,6 +7,11 @@ from django.db import connection
 
 register = template.Library()
 
+@register.inclusion_tag('issues/files.html')
+def issues_files(issue):
+    files = issue.document_set.all()
+    return {'response_files': files}
+
 @register.inclusion_tag('issues/responses.html')
 def show_responses(issue):
     issue_responses = issue.response_set.all()

@@ -51,6 +51,12 @@
         {{ object.desc | linebreaks }}
     </div>
 
+    <b>Attachments:</b>
+    <br/>
+    <div class="div-border">
+        {% issues_files object %}
+    </div>
+
     {% if object.completed %}
     <b>Resolution:</b><br/>
     <div class="div-border">

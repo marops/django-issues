@@ -63,7 +63,7 @@ class Issue(models.Model):
             return True
 
     def __str__(self):
-        return self.short_desc
+        return f"({self.id}){self.short_desc}"
 
     # def get_absolute_url(self):
     #     return reverse('todo:task_detail', kwargs={'task_id': self.id, })
@@ -109,7 +109,8 @@ class Document(models.Model):
     title = models.CharField(max_length=255, blank=True)
     file = models.FileField(upload_to='docs/')
     uploaded_at = models.DateTimeField(auto_now_add=True)
-    response_id = models.ForeignKey(Response, on_delete=models.CASCADE, blank=True, null=True)
+    response = models.ForeignKey(Response, on_delete=models.CASCADE, blank=True, null=True)
+    issue = models.ForeignKey(Issue, on_delete=models.CASCADE, blank=True, null=True)
 
     def snippet(self):
         # Define here rather than in __str__ so we can use it in the admin list_display

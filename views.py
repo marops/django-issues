@@ -30,7 +30,7 @@ def index(request):
         #if non manager go to the list of the logged in user
         return HttpResponseRedirect(reverse('issues:list'))
 
-    return render(request,'issues/index.html')
+    #return render(request,'issues/index.html')
 
 @group_required('engineer')
 def test(request):
@@ -228,6 +228,14 @@ def issue_new(request):
             # process the data in form.cleaned_data as requfrom django.core.mail import send_mailired
             rc=form.save()
 
+            files=request.FILES.getlist('attachments')
+            for f in files:
+                #handle_uploaded_file(f,'files/')
+                fn=path.join('docs',str(rc.id),f.name)
+                fn=default_storage.save(fn,f)
+                d = Document(file=fn,issue=rc)
+                d.save()
+
             # mail to submitted_by and engineers
             new_issue_mail(request,rc)
 
@@ -279,6 +287,15 @@ def issue_view(request,pk,action=None):
             # process the data in form.cleaned_data as required
             rc=form.save()
 
+            #handle attachments
+            files=request.FILES.getlist('attachments')
+            for f in files:
+                #handle_uploaded_file(f,'files/')
+                fn=path.join('docs',str(rc.id),f.name)
+                fn=default_storage.save(fn,f)
+                d = Document(file=fn,issue=rc)
+                d.save()
+
             #if completed send notification email
             if ('completed' in form.changed_data) and (rc.completed):
                 updated_issue_mail(request, rc, form.changed_data)
@@ -294,8 +311,9 @@ def issue_view(request,pk,action=None):
 
         form = IssueForm(instance=instance)
         tags_all=Tag.objects.all().order_by('name')
+        attachments=instance.document_set.all()
 
-    return render(request, 'issues/issue.html', {'form': form, 'rid':pk, 'tags_all': tags_all, 'action':action, 'is_engineer':is_engineer})
+    return render(request, 'issues/issue.html', {'form': form, 'rid':pk, 'tags_all': tags_all, 'action':action, 'is_engineer':is_engineer, 'attachments':attachments})
 
 @login_required
 def issue_detail(request, pk):
@@ -321,7 +339,7 @@ def issue_detail(request, pk):
                 #handle_uploaded_file(f,'files/')
                 fn=path.join('docs',str(pk),f.name)
                 fn=default_storage.save(fn,f)
-                d = Document(file=fn,response_id=rs)
+                d = Document(file=fn,response=rs)
                 d.save()
 
             #send email to author and (assigned_to or engineer group)

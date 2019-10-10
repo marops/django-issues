@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load crispy_forms_tags %}
+{% load issues_tags %}
 {% block content %}
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsoneditor/6.1.0/jsoneditor.min.css" />
@@ -8,31 +9,99 @@
 {{form.media.css}}
 
 <style>
-    #id_category, #id_submitted_by, #id_location {width:12em}
-    #id_created_date, #id_due_date, #id_completed_date {width:14em;}
-    #id_assigned_to, #id_submitted_by { width: 12em}
-    #id_priority { width: 4em}
-    //#id_title {max-width:400px}
-    form {max-width:1000px;margin: 0 auto}
-    #div_id_created_date {clear:left}
-    #div_id_created_date, #div_id_due_date, #div_id_completed_date {float:left;padding-right:1em;width:16em}
-    #div_id_submitted_by, #div_id_assigned_to {float:left;width:14em;}
-    #div_id_completed {clear:left;}
+        #id_category,
+        #id_submitted_by,
+        #id_location {
+          width: 12em
+        }
 
-    {% if action == 'new' %}
-    #div_id_assigned_to,#div_id_created_date, #div_id_completed_date, #div_id_due_date, #div_id_completed, #div_id_priority, #div_id_resolution, #div_id_tags {display:none}
-    {% endif %}
+        #id_created_date,
+        #id_due_date,
+        #id_completed_date {
+          width: 14em;
+        }
+
+        #id_assigned_to,
+        #id_submitted_by {
+          width: 12em
+        }
+
+        #id_priority {
+          width: 4em
+        }
+
+        //#id_title {max-width:400px}
+        form {
+          max-width: 1000px;
+          margin: 0 auto
+        }
+
+        #div_id_created_date {
+          clear: left
+        }
+
+        #div_id_created_date,
+        #div_id_due_date,
+        #div_id_completed_date {
+          float: left;
+          padding-right: 1em;
+          width: 16em
+        }
+
+        #div_id_submitted_by,
+        #div_id_assigned_to {
+          float: left;
+          width: 14em;
+        }
+
+        #div_id_completed {
+          clear: left;
+        }
+
+        #div_id_attachments {
+          padding-bottom:1em;
+        }
+
+        #id_attachments_list{
+            color: #495057;
+            background-color: #fff;
+            background-clip: padding-box;
+            border: 1px solid #ced4da;
+            border-radius: .25rem;
+            transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+        }
+
+        #id_attachments {
+          display:none;
+        }
+
+        #id_attachments_add {
+            padding-left:2em;
+        }
 
 </style>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.css" />
+
 {% if rid > 0 %}
 <h2>Issue Number {{rid}}</h2>
 {% else %}
 <h2>New Issue</h2>
 {% endif %}
-<form action="/issues/{{rid}}/edit/" method="post">
+<form action="/issues/{{rid}}/edit/" method="post" enctype="multipart/form-data">
     {% csrf_token %}
     {{ form|crispy }}
     <input type="hidden" id="id" name="id" value="3">
+
+    <div id="id_attachments_list">
+        {% issues_files form.instance %}
+
+          <div id="id_attachments_add">
+            <button id="id_attachments_button" class="btn btn-secondary btn-sm" title="Add more attachments">Add Files</button>
+            <div id="id_attachments_add_list"></div>
+          </div>
+    </div>
+
     <div style="clear:left"></div>
     <input type="submit" class="btn btn-primary" value="Submit" />
     <a href="/issues/{{rid}}/"> <button type="button" class="btn btn-primary">Cancel</button></a>
@@ -119,6 +188,27 @@
         {% endfor %}
    ];
 
+
+    // Attachments
+    //move attachement_list before the upload file input
+    $("#id_attachments").before($("#id_attachments_list"))
+
+    $( '#id_attachments_button' ).click( function() {
+        $( '#id_attachments' ).trigger( 'click' );
+        return false;
+    } );
+
+      $('#id_attachments').change(function(e) {
+        s = "<ul>"
+        for (x = 0; x < e.target.files.length; x++) {
+          s = s + "<li>" + e.target.files[x].name + "</li>"
+        }
+        s += "</ul>"
+        if (e.target.files.length > 0) {
+          $("#id_attachments_add_list").html(s)
+        } else $("#id_attachments_add_list").html("")
+
+      });
 
 </script>
 

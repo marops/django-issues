@@ -36,11 +36,12 @@ class IssueForm(forms.ModelForm):
     submitted_by = UserModelChoiceField(User.objects.all().order_by('last_name'))
     assigned_to = UserModelChoiceField(User.objects.all().order_by('last_name'), required=False)
     tags_select = MultipleChoiceFieldTags(required=False, label='Tags', choices=[], widget=SelectMultipleTag( attrs={'class':'tags-select2','multiple':'multiple'}))
+    attachments = forms.FileField(required=False, widget=forms.ClearableFileInput(attrs={'multiple': True}))
 
     class Meta:
         model=Issue
-        #fields=['headline','pub_date','content','reporter']
-        exclude=['modified_date']
+        #exclude=['modified_date']
+        fields=['short_desc','category','desc','location','metadata','submitted_by','metadata','assigned_to','created_date','due_date','completed_date','completed','priority','resolution' ]
 
         widgets = {
             'metadata': forms.Textarea(attrs={'cols': '40', 'rows': '2'})
@@ -53,6 +54,7 @@ class IssueNewForm(forms.ModelForm):
     #due_date=forms.DateField(required=False,widget=forms.TextInput(attrs={'type':'date'}))
     #completed_date=forms.DateTimeField(required=False, widget=forms.TextInput(attrs={'type':'date'}))
     submitted_by = UserModelChoiceField(User.objects.all().order_by('last_name'))
+    attachments = forms.FileField(required=False, widget=forms.ClearableFileInput(attrs={'multiple': True}))
 
     class Meta:
         model=Issue
