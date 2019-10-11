@@ -36,6 +36,35 @@
           clear: left;
         }
 
+        #div_id_attachments {
+          padding-bottom:1em;
+        }
+
+        #id_attachments_list{
+            color: #495057;
+            background-color: #fff;
+            background-clip: padding-box;
+            border: 1px solid #ced4da;
+            border-radius: .25rem;
+            transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+        }
+
+        #id_attachments {
+          display:none;
+        }
+
+        #id_attachments_add {
+            padding:.5em;
+        }
+
+        #id_attachments_button {
+            padding-left:.75em;
+        }
+
+        #id_attachments_add_list ul {
+            padding-top:0.5em;
+        }
+
       </style>
 
 
@@ -45,6 +74,14 @@
     {% csrf_token %}
     {{ form|crispy }}
     <input type="hidden" id="id" name="id" value="3">
+
+    <div id="id_attachments_list">
+          <div id="id_attachments_add">
+            <button id="id_attachments_button" class="btn btn-secondary btn-sm" title="Add more attachments">Add Files</button>
+            <div id="id_attachments_add_list"></div>
+          </div>
+    </div>
+
     <div style="clear:left; padding-top:1em; padding-bottom:1em">
 
     <input type="submit" class="btn btn-primary" value="Submit" />
@@ -54,7 +91,14 @@
 
 <script>
 
-      	$('<div id="id_attachments_list"></div>').insertAfter('#id_attachments')
+        // Attachments
+        //move attachement_list before the upload file input
+        $("#id_attachments").before($("#id_attachments_list"))
+
+        $('#id_attachments_button').click(function() {
+          $('#id_attachments').trigger('click');
+          return false;
+        });
 
         $('#id_attachments').change(function(e) {
           s = "<ul>"
@@ -62,9 +106,9 @@
             s = s + "<li>" + e.target.files[x].name + "</li>"
           }
           s += "</ul>"
-          if (e.target.files.length > 1) {
-            $("#id_attachments_list").html(s)
-          } else $("#id_attachments_list").html("")
+          if (e.target.files.length > 0) {
+            $("#id_attachments_add_list").html(s)
+          } else $("#id_attachments_add_list").html("")
 
         });
 
