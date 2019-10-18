@@ -64,6 +64,8 @@ class IssueNewForm(forms.ModelForm):
 
 class ResponseForm(ModelForm):
     #file = forms.FileField(widget=forms.ClearableFileInput(attrs={'multiple': True}))
+    attachments = forms.FileField(required=False, widget=forms.ClearableFileInput(attrs={'multiple': True}))
+
     class Meta:
         model = Response
         exclude= []

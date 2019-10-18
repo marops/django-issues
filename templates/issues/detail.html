@@ -21,6 +21,44 @@
     .response-number {}
 
     .div-border {padding:1em;border:1px solid silver;margin-left:1em}
+
+    //Attachments - custom control in New Response Form
+    #div_id_attachments {
+      padding-bottom: 1em;
+    }
+
+    #id_attachments {
+      display: none;
+    }
+
+    /* Custom Attachment Control*/
+
+    #id_attachments_control {
+      color: #495057;
+      background-color: #fff;
+      background-clip: padding-box;
+      border: 1px solid #ced4da;
+      border-radius: .25rem;
+      transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+      padding:.5em
+    }
+
+    #id_attachments_stored ul {
+      padding-top: .5em;
+    }
+
+    #id_attachments_button {
+      padding-left: .75em;
+    }
+
+    #id_attachments_add ul {
+      padding-top: .5em;
+      color: blue;
+    }
+
+
+
+
 </style>
 
 {% endaddtoblock %}
@@ -44,7 +82,7 @@
     <b>Assigned to</b>: {{object.assigned_to.get_full_name}}
     <b>Location</b>: {{object.location.name}}
     <br/><br/>
-    
+
     <b>Desc</b>:
     <br/>
     <div class="div-border">
@@ -92,11 +130,11 @@
         {% csrf_token %}
         {{ response_form|crispy }}
 
-
-      <div class="form-group">
-        <label for="file">Attachments</label>
-        <input type="file" class="form-control-file" id="file" name="file" multiple>
-      </div>
+        <!-- This is the custom control. It gets moved with JS before the input type=file -->
+        <div id="id_attachments_control">
+          <button id="id_attachments_button" class="btn btn-secondary btn-sm" title="Add attachments">Add Files</button>
+          <div id="id_attachments_add"></div>
+        </div>
 
         <button type="submit" class="btn btn-primary">Submit</button>
         <a href="/issues/{{rid}}/"> <button type="button" class="btn btn-primary">Cancel</button></a>
@@ -130,6 +168,31 @@
 
     //Tooltip
     $('.card-header').tooltip({title: "Click on box to expand/contract", placement: "top",  animation: true, delay: {show: 0, hide: 100}});
+
+    // Attachments
+    //move attachement_list before the upload file input and
+    $("#id_attachments").before($("#id_attachments_control"))
+
+    //hide id_attachment file upload input (done in stylesheet or js)
+
+    $('#id_attachments_button').click(function() {
+      $('#id_attachments').trigger('click');
+      return false;
+    });
+
+    $('#id_attachments').change(function(e) {
+      s = "<ul>"
+      // Attachment control
+      for (x = 0; x < e.target.files.length; x++) {
+        s = s + "<li>" + e.target.files[x].name + "</li>"
+      }
+      s += "</ul>"
+      if (e.target.files.length > 0) {
+        $("#id_attachments_add").html(s)
+      } else $("#id_attachments_add").html("")
+
+    });
+
 
 
 </script>
