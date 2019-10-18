@@ -34,7 +34,7 @@
     </h3>
     <b>Short Desc</b>: {{ object.short_desc }}
     <br/>
-    <b>Category</b>: {{ object.category }}
+    <b>Category</b>: {{ object.category }} &nbsp;&nbsp;<b>Tags:</b> {{object.tags.names|tags_string}}
     <br/>
     <b>Created</b>: {{object.created_date | date:"Y-m-d H:i:s e"}}
     <b>Due</b>: {{object.due_date | date:"Y-m-d"}}
@@ -43,8 +43,8 @@
     <b>Submitted by</b>: {{object.submitted_by.get_full_name}}<span style="width:2em">&nbsp</span>
     <b>Assigned to</b>: {{object.assigned_to.get_full_name}}
     <b>Location</b>: {{object.location.name}}
-    <br/>
-
+    <br/><br/>
+    
     <b>Desc</b>:
     <br/>
     <div class="div-border">
@@ -54,7 +54,7 @@
     <b>Attachments:</b>
     <br/>
     <div class="div-border">
-        {% issues_files object %}
+        {% issue_files attachments %}
     </div>
 
     {% if object.completed %}

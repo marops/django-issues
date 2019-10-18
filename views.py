@@ -250,7 +250,7 @@ def issue_new(request):
 @group_required('engineers')
 def issue_view(request,pk,action=None):
     """
-    New, Edit or Delete an Issue
+    Edit or Delete an Issue
 
     :param request:
     :param pk: Issue primary key. If 0 then creates new Issue
@@ -334,7 +334,7 @@ def issue_detail(request, pk):
         if form.is_valid():
             # file is saved
             rs=form.save()
-            files=request.FILES.getlist('file')
+            files=request.FILES.getlist('attachments')
             for f in files:
                 #handle_uploaded_file(f,'files/')
                 fn=path.join('docs',str(pk),f.name)
@@ -353,8 +353,10 @@ def issue_detail(request, pk):
     else:
         issue_responses=issue.response_set.all().order_by('date')
         response_form=ResponseForm(initial={'author': request.user, 'issue':issue.id})
+        tags=Tag.objects.all().order_by('name')
+        attachments=issue.document_set.all()
 
-    return render(request, 'issues/detail.html', { 'object': issue, 'rid': pk,'issue_responses':issue_responses,'response_form':response_form, 'can_edit':can_edit })
+    return render(request, 'issues/detail.html', { 'object': issue, 'rid': pk, 'attachments':attachments, 'tags':tags, 'issue_responses':issue_responses,'response_form':response_form, 'can_edit':can_edit })
 
 
 @method_decorator(login_required, name='dispatch')

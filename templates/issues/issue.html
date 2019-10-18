@@ -59,25 +59,38 @@
         }
 
         #div_id_attachments {
-          padding-bottom:1em;
-        }
-
-        #id_attachments_list{
-            color: #495057;
-            background-color: #fff;
-            background-clip: padding-box;
-            border: 1px solid #ced4da;
-            border-radius: .25rem;
-            transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+          padding-bottom: 1em;
         }
 
         #id_attachments {
-          display:none;
+          display: none;
         }
 
-        #id_attachments_add {
-            padding-left:2em;
+        /* Custom Attacment Control*/
+
+        #id_attachments_control {
+          color: #495057;
+          background-color: #fff;
+          background-clip: padding-box;
+          border: 1px solid #ced4da;
+          border-radius: .25rem;
+          transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+          padding:.5em
         }
+
+        #id_attachments_stored ul {
+          padding-top: .5em;
+        }
+
+        #id_attachments_button {
+          padding-left: .75em;
+        }
+
+        #id_attachments_add ul {
+          padding-top: .5em;
+          color: blue;
+        }
+
 
 </style>
 
@@ -93,13 +106,14 @@
     {{ form|crispy }}
     <input type="hidden" id="id" name="id" value="3">
 
-    <div id="id_attachments_list">
-        {% issues_files form.instance %}
-
-          <div id="id_attachments_add">
-            <button id="id_attachments_button" class="btn btn-secondary btn-sm" title="Add more attachments">Add Files</button>
-            <div id="id_attachments_add_list"></div>
+    <div id="id_attachments_control">
+      {% if attachments %}
+          <div id="id_attachments_stored">
+            {% issue_files attachments %}
           </div>
+      {% endif %}
+      <button id="id_attachments_button" class="btn btn-secondary btn-sm" title="Add attachments">Add Files</button>
+      <div id="id_attachments_add"></div>
     </div>
 
     <div style="clear:left"></div>
@@ -190,25 +204,28 @@
 
 
     // Attachments
-    //move attachement_list before the upload file input
-    $("#id_attachments").before($("#id_attachments_list"))
+    //move attachement_list before the upload file input and
+    $("#id_attachments").before($("#id_attachments_control"))
 
-    $( '#id_attachments_button' ).click( function() {
-        $( '#id_attachments' ).trigger( 'click' );
-        return false;
-    } );
+    //hide id_attachment file upload input (done in stylesheet or js)
 
-      $('#id_attachments').change(function(e) {
-        s = "<ul>"
-        for (x = 0; x < e.target.files.length; x++) {
-          s = s + "<li>" + e.target.files[x].name + "</li>"
-        }
-        s += "</ul>"
-        if (e.target.files.length > 0) {
-          $("#id_attachments_add_list").html(s)
-        } else $("#id_attachments_add_list").html("")
+    $('#id_attachments_button').click(function() {
+      $('#id_attachments').trigger('click');
+      return false;
+    });
 
-      });
+    $('#id_attachments').change(function(e) {
+      s = "<ul>"
+      // Attachment control
+      for (x = 0; x < e.target.files.length; x++) {
+        s = s + "<li>" + e.target.files[x].name + "</li>"
+      }
+      s += "</ul>"
+      if (e.target.files.length > 0) {
+        $("#id_attachments_add").html(s)
+      } else $("#id_attachments_add").html("")
+
+    });
 
 </script>
 

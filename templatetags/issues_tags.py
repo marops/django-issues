@@ -7,10 +7,10 @@ from django.db import connection
 
 register = template.Library()
 
-@register.inclusion_tag('issues/files.html')
-def issues_files(issue):
-    files = issue.document_set.all()
-    return {'response_files': files}
+@register.inclusion_tag('issues/issue_files.html')
+def issue_files(files):
+    #files = issue.document_set.all()
+    return {'issue_files': files}
 
 @register.inclusion_tag('issues/responses.html')
 def show_responses(issue):
@@ -63,3 +63,12 @@ def stats():
     stats['lte30'] = cur.fetchone()[0]
     stats['total_open'] = stats['gt90']+stats['lte90_gt30']+stats['lte30']
     return {'stats': stats}
+
+
+@register.filter(name='tags_string')
+def tags_string(value):
+    """Returns a string from Tags QuerySet of names"""
+    s = ""
+    for i in value:
+        s += i + ", "
+    return s[:-2]

@@ -20,11 +20,11 @@ $(document).ready(function(){
 //    t=$("#id_tags").val()
 //    arr=t.split(",")
     arr=$("#id_tags").val().trim().split(/\s*,\s*/);
-    console.log(arr)
+    //console.log(arr)
     //taggit puts " around string with space which needs to be removed for Select2. Just neec comma delimited
     for(i in arr){
         arr[i]=arr[i].replace(/\"/gm, "");
-        console.log(arr[i])
+        //console.log(arr[i])
     }
     $('#id_tags_select').val(arr);
     $('#id_tags_select').trigger('change');

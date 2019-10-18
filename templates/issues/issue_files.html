@@ -1,0 +1,5 @@
+<ul>
+{% for f in issue_files %}
+    <li> <a href="{{f.file.url}}" target="_blank">{{ f.snippet }}</a> </li>
+{% endfor %}
+</ul>

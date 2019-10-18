@@ -41,7 +41,7 @@ class IssueForm(forms.ModelForm):
     class Meta:
         model=Issue
         #exclude=['modified_date']
-        fields=['short_desc','category','desc','location','metadata','submitted_by','metadata','assigned_to','created_date','due_date','completed_date','completed','priority','resolution' ]
+        fields=['short_desc','category','desc','location','metadata','submitted_by','metadata','assigned_to','created_date','due_date','completed_date','completed','priority','resolution', 'tags' ]
 
         widgets = {
             'metadata': forms.Textarea(attrs={'cols': '40', 'rows': '2'})
