@@ -46,6 +46,11 @@ class IssueTest(TestCase):
         loc=Location.objects.get(lid="Other")
 
         login = self.client.login(username='todd', password='Lidar')
+
+        response=self.client.get('/issues/new/')
+        #Check for HTML inpyt type file tag, id=id_attachments
+        self.assertContains(response, 'id_attachments',msg_prefix="Requires input type file with id=id_attachments")
+
         data={'short_desc': 'Test1', 'desc': 'Test 1 desc', 'submitted_by': u.id, 'category': c.id, 'location':loc.lid}
         form = IssueForm(data)
         self.assertTrue(form.is_valid(),form.errors.as_json())
@@ -248,6 +253,38 @@ class IssueTest(TestCase):
         self.assertTemplateUsed(response, 'issues/dashboard.html')
 
 
+    def test_update_issue(self):
+        """
+        Tests updating an issue
+
+        Requirements:
+            * restricted to logged in
+            * must contain a field for attachments
+
+        :return:
+        """
+        c=Category.objects.get(name="LIDAR sensor")
+        u=User.objects.get(username="todd")
+        loc=Location.objects.get(lid="Other")
+
+        login = self.client.login(username='todd', password='Lidar')
+        data={'short_desc': 'Test1', 'desc': 'Test 1 desc', 'submitted_by': u.id, 'category': c.id,'location':loc.lid}
+        form = IssueForm(data)
+        self.assertTrue(form.is_valid(),form.errors.as_json())
+
+        response = self.client.post('/issues/new/', data)
+        #must be in engineers group or is_staff or is_superuser
+
+        self.assertRegex(response.url,r"^\/issues\/\d*\/")
+
+        issue=Issue.objects.get(short_desc="Test1")
+
+        response=self.client.get(f"/issues/{issue.id}/")
+        self.assertContains(response,"id_attachments",msg_prefix="Must contain HTML input type file with id=id_attachments")
+
+
+
+
     def test_update_issue_completed(self):
         """
         Tests entering a new issue
@@ -287,4 +324,5 @@ class IssueTest(TestCase):
             mc.append(f'{m.to}, {m.subject}')
 
         # print(f'EMAILS: {mc[1]}')
+
 
