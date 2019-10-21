@@ -94,7 +94,10 @@ def issues_list(request):
     headers=['Issue#','Short_Desc','Category','Location','Created','Submitted By','Assigned To','Completed','IsCompleted']
     #s='{}{}{}'.format(request.META['HTTP_HOST'],reverse('issues-list-data'),filter,)
     s = '{}{}'.format(reverse('issues:list-data'), filter, )
-    extra_context={'headers': headers,'ajax_url':s, 'title':title, 'is_manager':is_manager}
+
+    page_length = request.session.get('issues_list_length', '10')
+
+    extra_context={'headers': headers,'ajax_url':s, 'title':title, 'is_manager':is_manager, 'pageLength':page_length}
 
     #print(filter)
 
@@ -124,7 +127,10 @@ class DTIssueListViewData(BaseDatatableView):
         return Issue.objects.all()
 
     def filter_queryset(self, qs):
-        # simple example:
+
+        #save list length in the session
+        self.request.session['issues_list_length']=self.request.GET.get('length','10')
+
         search = self.request.GET.get(u'search[value]', None)
         if search:
             #qs = qs.filter(short_desc__istartswith=search)
@@ -195,7 +201,7 @@ class DTIssueListViewData(BaseDatatableView):
                 completed_date = ""
 
             json_data.append([
-                f'<a href="{url}/{i.id}">{i.id}</a>', f'<a href="{url}/{i.id}">{i.short_desc}</a>', category,
+                f'<a href="{url}/{i.id}" target="_{i.id}">{i.id}</a>', f'<a href="{url}/{i.id}" target="_{i.id}">{i.short_desc}</a>', category,
                 location, created_date, submitted_by, assigned_to, completed_date,i.completed
             ])
 
