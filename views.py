@@ -17,6 +17,7 @@ from django.db import connection
 from django.views.generic.base import TemplateView
 import json
 from django.utils.decorators import method_decorator
+from django.db import connection
 
 
 @login_required
@@ -32,10 +33,128 @@ def index(request):
 
     #return render(request,'issues/index.html')
 
+
+class SitrepView(TemplateView):
+
+    template_name = "issues/sitrep.html"
+
+    def getIssuesByCategoryByMonth(self):
+        cur = connection.cursor()
+
+        cur.execute("select name from issues_category order by name")
+        category = []
+        for c in cur:
+            category.append(c[0])
+
+        sql_months = """
+        SELECT to_char(created_date,'YYYY-MM') as yr_mon, count(*)
+        from issues_issue 
+        where completed=False
+        group by yr_mon order by yr_mon
+        """
+        cur.execute(sql_months)
+        months = []
+        for c in cur:
+            months.append(c[0])
+
+        sql = """
+        SELECT count(i.id) 
+        from issues_issue i left join issues_category c on i.category_id=c.id
+        where completed=False and c.name=%s and to_char(i.created_date,'YYYY-MM')=%s
+        """
+
+        dt = []
+        d = ['YearMonth']
+        d.extend(category)
+        dt.append(d)
+
+        for m in months:
+            d = []
+            d.append(m)
+            for c in category:
+                cur.execute(sql, [c, m])
+                d.append(cur.fetchone()[0])
+            dt.append(d)
+        return dt
+
+    def get_context_data(self, **kwargs):
+
+        data=[
+          ['YerMonth', 'EO sensor', 'general', 'IT Hardware', 'IT Software', 'LIDAR sensor'],
+          ['2019-06', 0, 1, 0, 0, 0],
+          ['2019-07', 1, 1, 0, 1, 0],
+          ['2019-08', 0, 0, 0, 1, 1],
+          ['2019-09', 1, 0, 1, 1, 1],
+          ['2019-10', 4, 0, 2, 2, 1],
+          ['2019-11', 1, 0, 9, 1, 2],
+        ]
+
+        data=self.getIssuesByCategoryByMonth()
+
+        context = super().get_context_data(**kwargs)
+        context['data'] = data
+        return context
+
+
 @group_required('engineer')
 def test(request):
-    is_engineer = request.user.groups.filter(name='engineers').exists()
-    msg=f'is_engineer={is_engineer}'
+    """
+    Downloads all movies as Excel file with a single worksheet
+    """
+
+    movie_queryset = Movie.objects.all()
+
+    response = HttpResponse(
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    )
+    response['Content-Disposition'] = 'attachment; filename={date}-movies.xlsx'.format(
+        date=datetime.now().strftime('%Y-%m-%d'),
+    )
+    workbook = Workbook()
+
+    # Get active worksheet/tab
+    worksheet = workbook.active
+    worksheet.title = 'Movies'
+
+    # Define the titles for columns
+    columns = [
+        'ID',
+        'Title',
+        'Description',
+        'Length',
+        'Rating',
+        'Price',
+    ]
+    row_num = 1
+
+    # Assign the titles for each cell of the header
+    for col_num, column_title in enumerate(columns, 1):
+        cell = worksheet.cell(row=row_num, column=col_num)
+        cell.value = column_title
+
+    # Iterate through all movies
+    for movie in movie_queryset:
+        row_num += 1
+
+        # Define the data for each cell in the row
+        row = [
+            movie.pk,
+            movie.title,
+            movie.description,
+            movie.length_in_minutes,
+            movie.rating,
+            movie.price,
+        ]
+
+        # Assign the data for each cell of the row
+        for col_num, cell_value in enumerate(row, 1):
+            cell = worksheet.cell(row=row_num, column=col_num)
+            cell.value = cell_value
+
+    workbook.save(response)
+
+    return response
+
     return render(request,'issues/test.html', {'is_engineer':is_engineer})
 
 @login_required

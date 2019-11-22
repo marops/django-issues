@@ -24,6 +24,7 @@ urlpatterns = [
     path('list/',views.issues_list, name='list'),
     path('dashboard/', views.dashboard, name='dashboard'),
     path('list/data/', login_required(views.DTIssueListViewData.as_view()), name='list-data'),
+    path('sitrep/',    login_required(views.SitrepView.as_view()), name='sitrep'),
     path('<int:pk>/', views.issue_detail, name='issue-detail'),
     path('<int:pk>/<str:action>/', views.issue_view, name='issues-action'),
     path('new/',views.issue_new, name='issue-new'),

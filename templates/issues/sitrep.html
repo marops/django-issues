@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% load issues_tags %}
+{% block content %}
+
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+<style>
+html {
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  height: 100%;
+  width: 100%;
+}
+
+.container {
+  //width: 100%;
+  //max-width: 100%;
+  height: 100%;
+  padding-right: 15px;
+  padding-left: 15px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.row {
+  background: #f8f9fa;
+  margin-top: 10px;
+}
+
+.col {
+  //border: solid 1px #6c757d;
+  padding: 0px;
+}
+
+.chart {
+  border: 1px solid gray;
+  min-height: 500px;
+  width: 80%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.chart_div {
+  border: 1px solid silver;
+}
+
+.div_link { text-align: center; }
+
+</style>
+
+<h2>SITREP Issues</h2>
+<hr/>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      <div id="chart_div" class="chart"></div>
+      <div class="div_link"><a id="link">Download</a></div>
+    </div>
+  </div>
+
+
+<script>
+    // Load the Visualization API and the corechart package.
+      google.charts.load('current', {
+        'packages': ['corechart']
+      });
+
+      // Set a callback to run when the Google Visualization API is loaded.
+      google.charts.setOnLoadCallback(drawChart);
+
+      // Callback that creates and populates a data table,
+      // instantiates the pie chart, passes in the data and
+      // draws it.
+      function drawChart() {
+
+        var data = google.visualization.arrayToDataTable({{data|safe}}, false); // 'false' means that the first row contains labels, not data.
+
+        // Set chart options
+        var options = {
+          'title': 'New Issues by Month',
+          //'width': '50%',
+          //'height': 600,
+          legend: {
+            position: 'top',
+            maxLines: 3
+          },
+          bar: {
+            groupWidth: '75%'
+          },
+          isStacked: true,
+          vAxis: {
+            gridlines: {
+              count: 10
+            },
+            title : 'New Issues'
+          },
+          hAxis: {
+            title: 'Year-Month'
+          },
+
+
+        };
+
+        // Instantiate and draw our chart, passing in some options.
+        var chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
+        var chart_link = document.getElementById('link');
+
+        // Wait for the chart to finish drawing before calling the getImageURI() method.
+        google.visualization.events.addListener(chart, 'ready', function() {
+          //chart_div.innerHTML = '<img src="' + chart.getImageURI() + '">';
+          chart_link.innerHTML = '<a href="' + chart.getImageURI() + '" download>Get PNG</a>';
+          //chart_link.href=chart.getImageURI()
+          //chart_link.download="myimage.png"
+          //console.log(chart.getImageURI());
+        });
+
+
+        chart.draw(data, options);
+      }
+
+
+      $(window).resize(function() {
+        drawChart();
+      });
+
+
+</script>
+
+{% endblock %}
