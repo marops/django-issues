@@ -77,22 +77,30 @@ class SitrepView(TemplateView):
             dt.append(d)
         return dt
 
-    def get_context_data(self, **kwargs):
+    def getData2(self):
+        sql = """
+        select metadata->'sid' as sid, count(*)
+        from issues_issue
+        where  metadata->'sid' is not null
+        group by  metadata->'sid'
+        order by sid
+        """
 
-        data=[
-          ['YerMonth', 'EO sensor', 'general', 'IT Hardware', 'IT Software', 'LIDAR sensor'],
-          ['2019-06', 0, 1, 0, 0, 0],
-          ['2019-07', 1, 1, 0, 1, 0],
-          ['2019-08', 0, 0, 0, 1, 1],
-          ['2019-09', 1, 0, 1, 1, 1],
-          ['2019-10', 4, 0, 2, 2, 1],
-          ['2019-11', 1, 0, 9, 1, 2],
-        ]
+        data = []
+        data.append(['sid', 'count'])
+        cur = connection.cursor()
+        cur.execute(sql)
+        for i in cur:
+            data.append([i[0], i[1]])
+        return data
+
+    def get_context_data(self, **kwargs):
 
         data=self.getIssuesByCategoryByMonth()
 
         context = super().get_context_data(**kwargs)
         context['data'] = data
+        context['data2'] = self.getData2()
         return context
 
 

@@ -4,7 +4,7 @@
 {% block content %}
 
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" integrity="sha256-+N4/V/SbAFiW1MPBCXnfnP9QSN3+Keu+NlB+0ev/YKQ=" crossorigin="anonymous" />
 <style>
 html {
   height: 100%;
@@ -17,9 +17,9 @@ body {
 }
 
 .container {
-  //width: 100%;
-  //max-width: 100%;
-  height: 100%;
+  width: 100%;
+  //max-width: 1000px;
+  //height: 100%;
   padding-right: 15px;
   padding-left: 15px;
   margin-right: auto;
@@ -39,13 +39,13 @@ body {
 .chart {
   border: 1px solid gray;
   min-height: 500px;
-  width: 80%;
-  margin-left: auto;
-  margin-right: auto;
+  width: 100%;
+  //margin-left: auto;
+  //margin-right: auto;
 }
 
-.chart_div {
-  border: 1px solid silver;
+.chart_wrap {
+  border: 0px solid silver;
 }
 
 .div_link { text-align: center; }
@@ -55,13 +55,19 @@ body {
 <h2>SITREP Issues</h2>
 <hr/>
 
-<div class="container">
+
   <div class="row">
-    <div class="col-md-12">
-      <div id="chart_div" class="chart"></div>
+    <div class="col-lg-6 chart_wrap">
+      <div id="chart_div" class="chart" rounded></div>
       <div class="div_link"><a id="link">Download</a></div>
     </div>
+    <div class="col-lg-6 chart_wrap">
+      <div id="chart2_div" class="chart" ></div>
+      <div class="div_link"><a id="link2">Download</a></div>
+    </div>
   </div>
+
+
 
 
 <script>
@@ -72,6 +78,7 @@ body {
 
       // Set a callback to run when the Google Visualization API is loaded.
       google.charts.setOnLoadCallback(drawChart);
+      google.charts.setOnLoadCallback(drawChart2);
 
       // Callback that creates and populates a data table,
       // instantiates the pie chart, passes in the data and
@@ -97,12 +104,11 @@ body {
             gridlines: {
               count: 10
             },
-            title : 'New Issues'
+            title : 'Number of Issues'
           },
           hAxis: {
             title: 'Year-Month'
           },
-
 
         };
 
@@ -119,13 +125,58 @@ body {
           //console.log(chart.getImageURI());
         });
 
-
         chart.draw(data, options);
       }
 
 
+      function drawChart2() {
+
+        var data = google.visualization.arrayToDataTable({{data2|safe}}, false); // 'false' means that the first row contains labels, not data.
+
+        // Set chart options
+        var options = {
+          'title': 'Issues by Sensor',
+          //'width': '50%',
+          //'height': 600,
+          legend: {
+            position: 'none',
+            //maxLines: 3
+          },
+          bar: {
+            groupWidth: '75%'
+          },
+          isStacked: false,
+          vAxis: {
+            gridlines: {
+              count: 10
+            },
+            title : 'Sensor (SID)'
+          },
+          hAxis: {
+            title: 'Number of Issues'
+          },
+
+        };
+
+        // Instantiate and draw our chart, passing in some options.
+        var chart = new google.visualization.BarChart(document.getElementById('chart2_div'));
+        var chart_link = document.getElementById('link2');
+
+        // Wait for the chart to finish drawing before calling the getImageURI() method.
+        google.visualization.events.addListener(chart, 'ready', function() {
+          //chart_div.innerHTML = '<img src="' + chart.getImageURI() + '">';
+          chart_link.innerHTML = '<a href="' + chart.getImageURI() + '" download>Get PNG</a>';
+          //chart_link.href=chart.getImageURI()
+          //chart_link.download="myimage.png"
+          //console.log(chart.getImageURI());
+        });
+
+        chart.draw(data, options);
+      }
+
       $(window).resize(function() {
         drawChart();
+        drawChart2();
       });
 
 
