@@ -426,6 +426,7 @@ def issue_view(request,pk,action=None):
 
         # create a form instance and populate it with data from the request:
         if(action=='delete'):
+            success_url=reverse('issues:list')
             instance.delete()
             return HttpResponseRedirect(success_url)
 
@@ -458,7 +459,7 @@ def issue_view(request,pk,action=None):
     else:
         if (action=="delete"):
             #instance = Person.objects.get(pk=pk)
-            return render(request, 'ticket/confirm_delete.html', {'object': instance,'success_url':success_url})
+            return render(request, 'issues/confirm_delete.html', {'object': instance,'success_url':success_url})
 
         form = IssueForm(instance=instance)
         tags_all=Tag.objects.all().order_by('name')
