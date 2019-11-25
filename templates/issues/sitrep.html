@@ -67,7 +67,16 @@ body {
     </div>
   </div>
 
-
+  <div class="row">
+    <div class="col-lg-6 chart_wrap">
+      <div id="chart3_div" class="chart" rounded>BiteME3</div>
+      <div class="div_link"><a id="link3">Download</a></div>
+    </div>
+    <div class="col-lg-6 chart_wrap">
+      <div id="chart4_div" class="chart" ></div>
+      <div class="div_link"><a id="link4">Download</a></div>
+    </div>
+  </div>
 
 
 <script>
@@ -79,6 +88,8 @@ body {
       // Set a callback to run when the Google Visualization API is loaded.
       google.charts.setOnLoadCallback(drawChart);
       google.charts.setOnLoadCallback(drawChart2);
+      google.charts.setOnLoadCallback(drawChart3);
+      google.charts.setOnLoadCallback(drawChart4);
 
       // Callback that creates and populates a data table,
       // instantiates the pie chart, passes in the data and
@@ -174,9 +185,104 @@ body {
         chart.draw(data, options);
       }
 
+
+      function drawChart3() {
+
+        var data = google.visualization.arrayToDataTable({{data3|safe}}, false); // 'false' means that the first row contains labels, not data.
+
+        // Set chart options
+        var options = {
+          'title': 'Issues by Tag',
+          //'width': '50%',
+          //'height': 600,
+          legend: {
+            position: 'none',
+            //maxLines: 3
+          },
+          bar: {
+            groupWidth: '75%'
+          },
+          isStacked: false,
+          vAxis: {
+            gridlines: {
+              count: 10
+            },
+            title : 'Tag'
+          },
+          hAxis: {
+            title: 'Number of Issues'
+          },
+
+        };
+
+        // Instantiate and draw our chart, passing in some options.
+        var chart = new google.visualization.BarChart(document.getElementById('chart3_div'));
+        var chart_link = document.getElementById('link3');
+
+        // Wait for the chart to finish drawing before calling the getImageURI() method.
+        google.visualization.events.addListener(chart, 'ready', function() {
+          //chart_div.innerHTML = '<img src="' + chart.getImageURI() + '">';
+          chart_link.innerHTML = '<a href="' + chart.getImageURI() + '" download>Get PNG</a>';
+          //chart_link.href=chart.getImageURI()
+          //chart_link.download="myimage.png"
+          //console.log(chart.getImageURI());
+        });
+
+        chart.draw(data, options);
+      }
+
+      function drawChart4() {
+
+        var data = google.visualization.arrayToDataTable({{data4|safe}}, false); // 'false' means that the first row contains labels, not data.
+
+        // Set chart options
+        var options = {
+          'title': 'Issues by Location',
+          //'width': '50%',
+          //'height': 600,
+          legend: {
+            position: 'none',
+            //maxLines: 3
+          },
+          bar: {
+            groupWidth: '75%'
+          },
+          isStacked: false,
+          vAxis: {
+            gridlines: {
+              count: 10
+            },
+            title : 'Location'
+          },
+          hAxis: {
+            title: 'Number of Issues'
+          },
+
+        };
+
+        // Instantiate and draw our chart, passing in some options.
+        var chart = new google.visualization.BarChart(document.getElementById('chart4_div'));
+        var chart_link = document.getElementById('link4');
+
+        // Wait for the chart to finish drawing before calling the getImageURI() method.
+        google.visualization.events.addListener(chart, 'ready', function() {
+          //chart_div.innerHTML = '<img src="' + chart.getImageURI() + '">';
+          chart_link.innerHTML = '<a href="' + chart.getImageURI() + '" download>Get PNG</a>';
+          //chart_link.href=chart.getImageURI()
+          //chart_link.download="myimage.png"
+          //console.log(chart.getImageURI());
+        });
+
+        chart.draw(data, options);
+      }
+
+
+
       $(window).resize(function() {
         drawChart();
         drawChart2();
+        drawChart3();
+        drawChart4();
       });
 
 

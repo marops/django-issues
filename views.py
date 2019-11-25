@@ -94,6 +94,22 @@ class SitrepView(TemplateView):
             data.append([i[0], i[1]])
         return data
 
+    def getData3(self):
+        data = [['tag', 'count']]
+        for t in Tag.objects.all().order_by('name'):
+            c = Issue.objects.filter(tags__name__in=[t.name]).count()
+            if c > 0:
+                data.append([t.name, c])
+        return data
+
+    def getData4(self):
+        data = [['location', 'count']]
+        for l in Location.objects.all().order_by('name'):
+            c = Issue.objects.filter(location=l).count()
+            if (c > 0):
+                data.append([l.name, c])
+        return data
+
     def get_context_data(self, **kwargs):
 
         data=self.getIssuesByCategoryByMonth()
@@ -101,6 +117,8 @@ class SitrepView(TemplateView):
         context = super().get_context_data(**kwargs)
         context['data'] = data
         context['data2'] = self.getData2()
+        context['data3'] = self.getData3()
+        context['data4'] = self.getData4()
         return context
 
 
