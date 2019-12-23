@@ -1,6 +1,5 @@
 {% autoescape off %}
 A new issue has been submitted and can be viewed at {{link}}.
-Please do not reply to this email.
 
 SUBMITTED_BY:      {{submitted_by}}
 LOCATION:           {{location}}
